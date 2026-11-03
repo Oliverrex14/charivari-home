@@ -32,7 +32,6 @@ import {
 
 export function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [reservantoOpen, setReservantoOpen] = useState(false);
   const [activeGalleryCategory, setActiveGalleryCategory] = useState<
     'all' | 'kurzy' | 'restaurovani' | 'veterani' | 'historie'
   >('all');
@@ -44,6 +43,10 @@ export function App() {
   const [voucherRecipient, setVoucherRecipient] = useState('');
   const [voucherDedication, setVoucherDedication] = useState('');
 
+  // Input sanitization helper against injection / control characters
+  const sanitizeInput = (value: string, maxLen: number) =>
+    value.replace(/[\u0000-\u001F\u007F<>]/g, '').slice(0, maxLen);
+
   // Filtered gallery items
   const filteredGallery =
     activeGalleryCategory === 'all'
@@ -52,12 +55,11 @@ export function App() {
 
   const displayedGallery = showAllGallery ? filteredGallery : filteredGallery.slice(0, 12);
 
-  // Keyboard navigation for lightbox & modals
+  // Keyboard navigation for lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setLightboxItem(null);
-        setReservantoOpen(false);
       }
       if (lightboxItem) {
         const currentIndex = filteredGallery.findIndex((i) => i.id === lightboxItem.id);
@@ -80,11 +82,13 @@ export function App() {
       selectedVoucherCourse === '3300'
         ? 'Kurz Renovace a čalounění nábytku (3 300 Kč)'
         : 'Kurz Výroba čalouněného taburetu (3 900 Kč)';
+    const cleanRecipient = sanitizeInput(voucherRecipient.trim(), 100);
+    const cleanDedication = sanitizeInput(voucherDedication.trim(), 300);
     const subject = encodeURIComponent(`Objednávka dárkového poukazu – ${courseName}`);
     const body = encodeURIComponent(
       `Dobrý den,\n\nmám zájem o dárkový poukaz na ${courseName}.\n` +
-        (voucherRecipient ? `Jméno obdarovaného: ${voucherRecipient}\n` : '') +
-        (voucherDedication ? `Text věnování na poukaz: "${voucherDedication}"\n` : '') +
+        (cleanRecipient ? `Jméno obdarovaného: ${cleanRecipient}\n` : '') +
+        (cleanDedication ? `Text věnování na poukaz: "${cleanDedication}"\n` : '') +
         `\nProsím o informace k platbě a předání.\n\nDěkuji a přeji pěkný den.`
     );
     window.location.href = `mailto:${CONTACT_INFO.emailCourses}?subject=${subject}&body=${body}`;
@@ -173,13 +177,16 @@ export function App() {
 
           {/* Header CTA */}
           <div className="hidden sm:flex items-center gap-3">
-            <button
-              onClick={() => setReservantoOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1F1A17] text-[#F5EFE6] hover:bg-[#332922] text-sm font-medium shadow-sm border border-[#C69C49]/50 transition-all cursor-pointer"
+            <a
+              href={CONTACT_INFO.reservantoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1F1A17] text-[#F5EFE6] hover:bg-[#332922] text-sm font-medium shadow-sm border border-[#C69C49]/50 transition-all"
             >
               <Calendar className="w-4 h-4 text-[#DFB968]" />
               <span>Rezervace kurzů</span>
-            </button>
+              <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -215,16 +222,17 @@ export function App() {
               </a>
             ))}
             <div className="pt-3 flex flex-col gap-2.5">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setReservantoOpen(true);
-                }}
+              <a
+                href={CONTACT_INFO.reservantoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
                 className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#1F1A17] text-[#F5EFE6] font-medium border border-[#C69C49]/50"
               >
                 <Calendar className="w-4 h-4 text-[#DFB968]" />
                 <span>Rezervace termínů kurzů</span>
-              </button>
+                <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+              </a>
               <a
                 href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
                 className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[#C69C49] text-[#1F1A17] font-medium"
@@ -268,14 +276,16 @@ export function App() {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4 pt-2">
-                <button
-                  onClick={() => setReservantoOpen(true)}
-                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-base shadow-lg shadow-[#1F1A17]/15 border border-[#C69C49]/60 transition-all cursor-pointer group"
+                <a
+                  href={CONTACT_INFO.reservantoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-base shadow-lg shadow-[#1F1A17]/15 border border-[#C69C49]/60 transition-all group"
                 >
                   <Calendar className="w-5 h-5 text-[#DFB968]" />
                   <span>Rezervace termínů kurzů</span>
-                  <ArrowRight className="w-4 h-4 text-[#DFB968] group-hover:translate-x-1 transition-transform" />
-                </button>
+                  <ExternalLink className="w-4 h-4 text-[#DFB968] group-hover:translate-x-0.5 transition-transform" />
+                </a>
 
                 <a
                   href="#restaurovani"
@@ -479,13 +489,16 @@ export function App() {
               </p>
             </div>
             <div className="shrink-0">
-              <button
-                onClick={() => setReservantoOpen(true)}
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm shadow-md border border-[#C69C49]/50 cursor-pointer"
+              <a
+                href={CONTACT_INFO.reservantoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm shadow-md border border-[#C69C49]/50"
               >
                 <Calendar className="w-4 h-4 text-[#DFB968]" />
                 <span>Zobrazit volné termíny v kalendáři</span>
-              </button>
+                <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+              </a>
             </div>
           </div>
 
@@ -565,13 +578,16 @@ export function App() {
 
                 {/* Course Footer CTA */}
                 <div className="px-6 sm:px-8 pb-8 pt-2 flex flex-wrap items-center justify-between gap-4">
-                  <button
-                    onClick={() => setReservantoOpen(true)}
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm border border-[#C69C49]/50 transition-all cursor-pointer"
+                  <a
+                    href={CONTACT_INFO.reservantoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm border border-[#C69C49]/50 transition-all"
                   >
                     <Calendar className="w-4 h-4 text-[#DFB968]" />
                     <span>Rezervovat termín ({course.price})</span>
-                  </button>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                  </a>
                   <a
                     href="#poukazy"
                     className="inline-flex items-center justify-center gap-1.5 py-3.5 px-4 rounded-xl border border-[#C69C49]/60 text-[#1F1A17] hover:bg-[#EFE7DA] text-sm font-medium transition-all"
@@ -977,15 +993,17 @@ export function App() {
                 </label>
                 <input
                   type="text"
+                  maxLength={100}
                   value={voucherRecipient}
-                  onChange={(e) => setVoucherRecipient(e.target.value)}
+                  onChange={(e) => setVoucherRecipient(sanitizeInput(e.target.value, 100))}
                   placeholder="Jméno obdarovaného (např. Pro maminku k narozeninám)"
                   className="w-full px-4 py-3 rounded-xl bg-[#FAF6F0] border border-[#DFD2BE] focus:outline-none focus:border-[#9E7425] text-sm"
                 />
                 <textarea
                   rows={2}
+                  maxLength={300}
                   value={voucherDedication}
-                  onChange={(e) => setVoucherDedication(e.target.value)}
+                  onChange={(e) => setVoucherDedication(sanitizeInput(e.target.value, 300))}
                   placeholder="Váš text věnování na voucher..."
                   className="w-full px-4 py-3 rounded-xl bg-[#FAF6F0] border border-[#DFD2BE] focus:outline-none focus:border-[#9E7425] text-sm"
                 />
@@ -993,21 +1011,24 @@ export function App() {
 
               {/* Step 3: Order Buttons */}
               <div className="pt-2 flex flex-wrap items-center gap-3">
+                <a
+                  href={CONTACT_INFO.reservantoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm border border-[#C69C49]/50 shadow-md transition-all"
+                >
+                  <Calendar className="w-4 h-4 text-[#DFB968]" />
+                  <span>Přejít do rezervačního systému</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                </a>
                 <button
                   type="button"
                   onClick={handleVoucherMailto}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm border border-[#C69C49]/50 shadow-md transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[#FAF6F0] hover:bg-[#EFE7DA] text-[#1F1A17] font-medium text-sm border border-[#C69C49]/60 transition-all cursor-pointer"
                 >
-                  <Mail className="w-4 h-4 text-[#DFB968]" />
-                  <span>Objednat poukaz e-mailem ({CONTACT_INFO.emailCourses})</span>
+                  <Mail className="w-4 h-4 text-[#9E7425]" />
+                  <span>Objednat e-mailem</span>
                 </button>
-                <a
-                  href={`tel:${CONTACT_INFO.phoneCourses.replace(/\s+/g, '')}`}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[#FAF6F0] hover:bg-[#EFE7DA] text-[#1F1A17] font-medium text-sm border border-[#C69C49]/60 transition-all"
-                >
-                  <Phone className="w-4 h-4 text-[#9E7425]" />
-                  <span>Tel.: {CONTACT_INFO.phoneCoursesDisplay}</span>
-                </a>
               </div>
             </div>
           </div>
@@ -1203,7 +1224,7 @@ export function App() {
                 <a
                   href={CONTACT_INFO.facebookUrl}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#261E19] hover:bg-[#332922] text-[#FAF6F0] text-xs font-medium border border-[#C69C49]/30 transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
@@ -1274,7 +1295,7 @@ export function App() {
                     <a
                       href="https://maps.google.com/?q=Nová+Ves+22,+277+52"
                       target="_blank"
-                      rel="noreferrer"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-[#DFB968] hover:underline mt-1"
                     >
                       <span>Otevřít v Google Mapách</span>
@@ -1284,13 +1305,16 @@ export function App() {
                 </div>
               </div>
 
-              <button
-                onClick={() => setReservantoOpen(true)}
-                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#C69C49] hover:bg-[#d4ab57] text-[#181310] font-semibold text-sm shadow-lg transition-all cursor-pointer"
+              <a
+                href={CONTACT_INFO.reservantoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#C69C49] hover:bg-[#d4ab57] text-[#181310] font-semibold text-sm shadow-lg transition-all"
               >
                 <Calendar className="w-4 h-4" />
                 <span>Rezervace termínů kurzů online</span>
-              </button>
+                <ExternalLink className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
@@ -1317,52 +1341,6 @@ export function App() {
           </div>
         </div>
       </footer>
-
-      {/* RESERVANTO BOOKING MODAL */}
-      {reservantoOpen && (
-        <div className="fixed inset-0 z-50 bg-[#181310]/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6">
-          <div className="bg-[#FAF6F0] w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl border border-[#C69C49]/50 flex flex-col h-[88vh]">
-            <div className="px-6 py-4 bg-[#181310] text-[#FAF6F0] flex items-center justify-between gap-4 border-b border-[#C69C49]/30">
-              <div className="flex items-center gap-2.5">
-                <Calendar className="w-5 h-5 text-[#DFB968]" />
-                <div>
-                  <h3 className="font-serif text-xl font-semibold leading-none">
-                    Rezervace termínů kurzů – CHARIVARI HOME
-                  </h3>
-                  <p className="text-xs text-[#C6B8A8] mt-1">
-                    Vyberte si volný termín v rezervačním systému Reservanto
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <a
-                  href={CONTACT_INFO.reservantoUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#261E19] hover:bg-[#332922] text-xs text-[#DFB968] border border-[#C69C49]/30"
-                >
-                  <span>Otevřít v novém okně</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-                <button
-                  onClick={() => setReservantoOpen(false)}
-                  aria-label="Zavřít"
-                  className="p-2 rounded-lg bg-[#261E19] hover:bg-[#332922] text-[#FAF6F0] cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-            <div className="flex-1 bg-white relative">
-              <iframe
-                src={CONTACT_INFO.reservantoUrl}
-                title="Rezervace kurzů Reservanto"
-                className="w-full h-full border-0"
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* PHOTO LIGHTBOX MODAL */}
       {lightboxItem && (
