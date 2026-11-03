@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Cormorant Garamond', Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #FAF6F0;
+    color: #1F1A17;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: var(--font-serif);
+  }
+}
+
+/* Custom subtle warm linen background pattern */
+.bg-linen {
+  background-color: #FAF6F0;
+  background-image: radial-gradient(#C69C49 0.45px, transparent 0.45px), radial-gradient(#C69C49 0.45px, #FAF6F0 0.45px);
+  background-size: 28px 28px;
+  background-position: 0 0, 14px 14px;
+  background-blend-mode: multiply;
+}
+
+/* Archival sepia hover transition */
+.archival-photo {
+  filter: sepia(0.18) contrast(1.03);
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.archival-photo:hover {
+  filter: sepia(0) contrast(1.05);
+}
+
+/* Gold shimmer border effect */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #DFB968 0%, #B88732 50%, #E7C981 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}

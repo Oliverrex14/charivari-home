@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.cert
+
+# Build, TypeScript & Vercel artifacts
+.vercel/
+dist/
+dist-ssr/
+build/
+out/
+.cache/
+.turbo/
+*.tsbuildinfo
+*.local
+
+# Testing & Coverage
+coverage/
+*.lcov
+.nyc_output
+
+# macOS, Windows & Linux OS files
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editors & IDEs
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*.swn
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*~
+
+# Runtime, Temp & Logs
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
