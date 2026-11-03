@@ -592,11 +592,12 @@ export function App() {
               </div>
               <div>
                 <h4 className="font-serif text-lg font-semibold text-[#1F1A17]">
-                  Pracovní oblečení a nářadí
+                  Ochranné pomůcky a nářadí k zapůjčení
                 </h4>
                 <p className="text-xs sm:text-sm text-[#5A4C41] mt-0.5">
-                  U nás se práší a občas i barví – přímo v dílně máme pro vás k zapůjčení pracovní
-                  zástěry a veškeré profesionální nářadí.
+                  U nás se práší a občas i barví – v dílně jsou pro vás k zapůjčení zástěry,
+                  pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka i veškeré
+                  profesionální nářadí.
                 </p>
               </div>
             </div>

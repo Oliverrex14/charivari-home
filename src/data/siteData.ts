@@ -76,7 +76,7 @@ export const COURSES = [
       'Udržitelnost v praxi: Z věcí, které ostatní vyhazují, společně tvoříme poklady.',
       'Poctivé vybavení: Práce v plně vybavené dílně s profesionálním nářadím.',
       'Znalosti, co zůstanou: Odnášíte si nejen hotový kus, ale i know-how pro další projekty.',
-      'Zástěry k zapůjčení, káva, čaj a drobné občerstvení v dílně zdarma.',
+      'K zapůjčení jsou zástěry, pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka (káva, čaj a občerstvení v dílně zdarma).',
     ],
   },
   {
@@ -99,6 +99,7 @@ export const COURSES = [
       'Volba výplně na míru: vyšší, nižší, měkčí nebo tvrdší na sezení.',
       'Zdobení: naučíme vás přidat ozdobné čalounické knoflíky nebo elegantní paspuli.',
       'Nožičky na výběr z několika typů včetně volby barvy a povrchové úpravy.',
+      'K zapůjčení jsou zástěry, pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka.',
     ],
   },
 ];
