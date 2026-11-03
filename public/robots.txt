@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://charivarihome.cz/sitemap.xml
+Sitemap: https://www.charivarihome.com/sitemap.xml
