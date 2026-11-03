@@ -18,6 +18,11 @@ export const CONTACT_INFO = {
   address: 'Nová Ves 22, 277 52 (u Mělníka)',
   facebookUrl: 'https://www.facebook.com/profile.php?id=100064973103133',
   reservantoUrl: 'https://booking.reservanto.cz/Modal/?id=15234&seg=1018',
+  // Legal identification of the business (údaje dle ARES / § 435 občanského zákoníku)
+  legalName: 'Ladislav Tobiášek',
+  ico: '47045086',
+  registeredSeat: 'č.p. 194, 277 52 Nová Ves',
+  registration: 'Fyzická osoba podnikající dle živnostenského zákona, zapsaná v živnostenském rejstříku',
 };
 
 export const HISTORICAL_PHOTOS = [

@@ -1318,9 +1318,67 @@ export function App() {
             </div>
           </div>
 
+          {/* Legal: operator identification, copyright & privacy */}
+          <div className="pt-8 grid md:grid-cols-3 gap-6 text-xs text-[#8C7D70] leading-relaxed border-b border-[#332922] pb-8">
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider font-semibold text-[#C6B8A8] mb-1.5">
+                Provozovatel
+              </h4>
+              <p>
+                {CONTACT_INFO.legalName}, IČO: {CONTACT_INFO.ico}
+                <br />
+                Sídlo: {CONTACT_INFO.registeredSeat}
+                <br />
+                Provozovna (dílna): Nová Ves 22, 277 52
+                <br />
+                {CONTACT_INFO.registration}. Není plátcem DPH.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider font-semibold text-[#C6B8A8] mb-1.5">
+                Autorská práva
+              </h4>
+              <p>
+                Veškeré fotografie, texty, logo a grafika na tomto webu jsou autorskými díly
+                provozovatele nebo jeho rodinného archivu a jsou chráněny zákonem č. 121/2000 Sb.,
+                autorský zákon. Jejich kopírování, šíření či jiné užití bez předchozího písemného
+                souhlasu je zakázáno.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-[11px] uppercase tracking-wider font-semibold text-[#C6B8A8] mb-1.5">
+                Ochrana osobních údajů
+              </h4>
+              <p>
+                Web nepoužívá cookies ani sledovací nástroje třetích stran. Anonymní statistiky
+                návštěvnosti zajišťuje Vercel Web Analytics bez cookies a bez ukládání IP adres.
+                Údaje, které nám pošlete e-mailem či telefonicky, zpracováváme pouze za účelem
+                vyřízení vaší poptávky (čl. 6 odst. 1 písm. b) GDPR). Rezervace a platby probíhají
+                výhradně v systému{' '}
+                <a
+                  href="https://www.reservanto.cz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-[#DFB968]"
+                >
+                  Reservanto
+                </a>
+                , který se řídí vlastními podmínkami. Své dotazy či žádosti (přístup, oprava,
+                výmaz údajů) směřujte na{' '}
+                <a href={`mailto:${CONTACT_INFO.emailMain}`} className="underline hover:text-[#DFB968]">
+                  {CONTACT_INFO.emailMain}
+                </a>
+                .
+              </p>
+            </div>
+          </div>
+
           {/* Bottom Copyright */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#8C7D70]">
-            <div>© 2026 CHARIVARI HOME – Ladislav Tobiášek. Vytvořil Oliver Tobiášek.</div>
+            <div>
+              © {new Date().getFullYear()} CHARIVARI HOME – Ladislav Tobiášek. Všechna práva
+              vyhrazena. Web vytvořil Oliver Tobiášek.
+            </div>
             <div className="flex flex-wrap gap-5">
               <a href="#kurzy" className="hover:text-[#DFB968]">
                 Kurzy
