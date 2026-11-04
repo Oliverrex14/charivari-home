@@ -2,42 +2,46 @@
 
 @layer base {
   :root {
-    --font-serif: 'Cormorant Garamond', Georgia, Cambria, "Times New Roman", Times, serif;
+    --font-serif: 'DM Serif Display', Georgia, "Times New Roman", serif;
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
+  html { scroll-behavior: smooth; }
+
   body {
     font-family: var(--font-sans);
-    background-color: #FAF6F0;
-    color: #1F1A17;
+    background-color: #FAFAF7;
+    color: #151515;
   }
 
   h1, h2, h3, h4, .font-serif {
     font-family: var(--font-serif);
+    font-weight: 400 !important;
+    letter-spacing: -0.02em;
   }
+  h1 { line-height: 1.02 !important; }
+
+  ::selection { background: #8B2E2E; color: #fff; }
 }
 
-/* Custom subtle warm linen background pattern */
-.bg-linen {
-  background-color: #FAF6F0;
-  background-image: radial-gradient(#C69C49 0.45px, transparent 0.45px), radial-gradient(#C69C49 0.45px, #FAF6F0 0.45px);
-  background-size: 28px 28px;
-  background-position: 0 0, 14px 14px;
-  background-blend-mode: multiply;
-}
+/* Editorial: clean paper, no texture */
+.bg-linen { background-color: #FAFAF7; }
 
-/* Archival sepia hover transition */
+/* Sharp, magazine-like geometry */
+[class*="rounded"]:not([class*="rounded-full"]) { border-radius: 0 !important; }
+img { border-radius: 0; }
+[class*="shadow"] { box-shadow: none !important; }
+section { border-color: #151515; }
+section > div > h2, section h2 { text-transform: none; }
+
+/* Uppercase micro-labels in buttons/links */
+a[class*="uppercase"], button[class*="uppercase"] { letter-spacing: 0.14em; }
+
 .archival-photo {
-  filter: sepia(0.18) contrast(1.03);
-  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: grayscale(0.85) contrast(1.05);
+  transition: filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.archival-photo:hover {
-  filter: sepia(0) contrast(1.05);
-}
+.archival-photo:hover { filter: grayscale(0) contrast(1.02); }
 
-/* Gold shimmer border effect */
-.gold-gradient-text {
-  background: linear-gradient(135deg, #DFB968 0%, #B88732 50%, #E7C981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+/* Oxblood accent text */
+.gold-gradient-text { color: #8B2E2E; -webkit-text-fill-color: #8B2E2E; background: none; }
