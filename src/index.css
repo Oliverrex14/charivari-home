@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+/* Theme tokens – light (default) and dark. Dark sections (top bar, veterans, footer, photo overlays) keep fixed colours. */
+:root {
+  --c-paper:#FAFAF7; --c-ink:#151515; --c-alt:#EFEDE6; --c-alt2:#E8E5DD;
+  --c-line:#D6D2C8; --c-line2:#CFCABD;
+  --c-g55:#555555; --c-g44:#444444; --c-g2e:#2E2E2E; --c-g26:#262626; --c-g5e:#5E5E5E; --c-g77:#777777; --c-g88:#888888;
+  --c-acc:#8B2E2E; --c-acc2:#6E1F1F; --c-acc3:#4A1515; --c-icon:#E3A59B;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --c-paper:#141414; --c-ink:#F2EFE8; --c-alt:#1C1B19; --c-alt2:#242321;
+  --c-line:#36332D; --c-line2:#443F37;
+  --c-g55:#B8B4AA; --c-g44:#C9C5BB; --c-g2e:#DAD6CC; --c-g26:#D5D1C7; --c-g5e:#A8A49A; --c-g77:#9A968C; --c-g88:#8A867C;
+  --c-acc:#C9584B; --c-acc2:#E08F84; --c-acc3:#F0B4AB; --c-icon:#8B2E2E;
+  color-scheme: dark;
+}
+body, header, section, footer { transition: background-color .25s ease, color .25s ease, border-color .25s ease; }
+
 @layer base {
   :root {
     --font-serif: 'DM Serif Display', Georgia, "Times New Roman", serif;
@@ -10,8 +27,8 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: #FAFAF7;
-    color: #151515;
+    background-color: var(--c-paper);
+    color: var(--c-ink);
   }
 
   h1, h2, h3, h4, .font-serif {
@@ -21,17 +38,17 @@
   }
   h1 { line-height: 1.02 !important; }
 
-  ::selection { background: #8B2E2E; color: #fff; }
+  ::selection { background: var(--c-acc); color: #fff; }
 }
 
 /* Editorial: clean paper, no texture */
-.bg-linen { background-color: #FAFAF7; }
+.bg-linen { background-color: var(--c-paper); }
 
 /* Sharp, magazine-like geometry */
 [class*="rounded"]:not([class*="rounded-full"]) { border-radius: 0 !important; }
 img { border-radius: 0; }
 [class*="shadow"] { box-shadow: none !important; }
-section { border-color: #151515; }
+section { border-color: var(--c-ink); }
 section > div > h2, section h2 { text-transform: none; }
 
 /* Uppercase micro-labels in buttons/links */
@@ -42,6 +59,8 @@ a[class*="uppercase"], button[class*="uppercase"] { letter-spacing: 0.14em; }
   transition: filter 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .archival-photo:hover { filter: grayscale(0) contrast(1.02); }
+:root[data-theme="dark"] img { filter: brightness(.92); }
+:root[data-theme="dark"] .archival-photo:hover { filter: grayscale(0) brightness(1); }
 
 /* Oxblood accent text */
-.gold-gradient-text { color: #8B2E2E; -webkit-text-fill-color: #8B2E2E; background: none; }
+.gold-gradient-text { color: var(--c-acc); -webkit-text-fill-color: var(--c-acc); background: none; }

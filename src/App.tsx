@@ -21,6 +21,8 @@ import {
   Award,
   Camera,
   Clock,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import {
   CONTACT_INFO,
@@ -32,6 +34,19 @@ import {
 
 export function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
+    document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+  );
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      /* storage unavailable – theme just isn't persisted */
+    }
+  };
   const [activeGalleryCategory, setActiveGalleryCategory] = useState<
     'all' | 'kurzy' | 'restaurovani' | 'veterani' | 'historie'
   >('all');
@@ -95,9 +110,9 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAFAF7] text-[#151515]">
+    <div className="min-h-screen flex flex-col bg-[var(--c-paper)] text-[var(--c-ink)]">
       {/* Top Heritage Bar */}
-      <div className="bg-[#121212] text-[#E4E1DA] text-xs sm:text-sm py-2.5 px-4 border-b border-[#8B2E2E]/25">
+      <div className="bg-[#121212] text-[#E4E1DA] text-xs sm:text-sm py-2.5 px-4 border-b border-[var(--c-acc)]/25">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-[#E3A59B]">
             <Sparkles className="w-3.5 h-3.5 shrink-0" />
@@ -110,15 +125,15 @@ export function App() {
               href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
               className="flex items-center gap-1.5 hover:text-[#E3A59B] transition-colors"
             >
-              <Phone className="w-3.5 h-3.5 text-[#8B2E2E]" />
+              <Phone className="w-3.5 h-3.5 text-[var(--c-acc)]" />
               <span>{CONTACT_INFO.phoneMainDisplay}</span>
             </a>
-            <span className="hidden md:inline text-[#8B2E2E]/40">|</span>
+            <span className="hidden md:inline text-[var(--c-acc)]/40">|</span>
             <a
               href="#kontakt"
               className="hidden md:flex items-center gap-1.5 hover:text-[#E3A59B] transition-colors"
             >
-              <MapPin className="w-3.5 h-3.5 text-[#8B2E2E]" />
+              <MapPin className="w-3.5 h-3.5 text-[var(--c-acc)]" />
               <span>{CONTACT_INFO.address}</span>
             </a>
           </div>
@@ -126,11 +141,11 @@ export function App() {
       </div>
 
       {/* Main Sticky Header */}
-      <header className="sticky top-0 z-40 bg-[#FAFAF7]/95 backdrop-blur-md border-b border-[#D6D2C8] transition-all">
+      <header className="sticky top-0 z-40 bg-[var(--c-paper)]/95 backdrop-blur-md border-b border-[var(--c-line)] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-3.5 group">
-            <div className="w-14 h-12 rounded-lg overflow-hidden border border-[#8B2E2E]/40 bg-[#121212] shadow-sm shrink-0">
+            <div className="w-14 h-12 rounded-lg overflow-hidden border border-[var(--c-acc)]/40 bg-[#121212] shadow-sm shrink-0">
               <img
                 src="/images/logo-zlate.jpg"
                 alt="CHARIVARI HOME logo"
@@ -138,39 +153,39 @@ export function App() {
               />
             </div>
             <div>
-              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-wider text-[#151515] leading-none">
+              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-wider text-[var(--c-ink)] leading-none">
                 CHARIVARI HOME
               </span>
-              <span className="block text-[11px] uppercase tracking-[0.18em] text-[#777777] mt-1">
+              <span className="block text-[11px] uppercase tracking-[0.18em] text-[var(--c-g77)] mt-1">
                 Restaurování &amp; Kurzy čalounění
               </span>
             </div>
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[#2E2E2E]">
-            <a href="#sluzby" className="hover:text-[#6E1F1F] transition-colors">
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[var(--c-g2e)]">
+            <a href="#sluzby" className="hover:text-[var(--c-acc2)] transition-colors">
               Co nabízíme
             </a>
-            <a href="#kurzy" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#kurzy" className="hover:text-[var(--c-acc2)] transition-colors">
               Kurzy čalounění
             </a>
-            <a href="#restaurovani" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#restaurovani" className="hover:text-[var(--c-acc2)] transition-colors">
               Zakázkové restaurování
             </a>
-            <a href="#veterani" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#veterani" className="hover:text-[var(--c-acc2)] transition-colors">
               Autoveteráni
             </a>
-            <a href="#poukazy" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#poukazy" className="hover:text-[var(--c-acc2)] transition-colors">
               Dárkové poukazy
             </a>
-            <a href="#historie" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#historie" className="hover:text-[var(--c-acc2)] transition-colors">
               Rodinná historie
             </a>
-            <a href="#galerie" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#galerie" className="hover:text-[var(--c-acc2)] transition-colors">
               Galerie
             </a>
-            <a href="#kontakt" className="hover:text-[#6E1F1F] transition-colors">
+            <a href="#kontakt" className="hover:text-[var(--c-acc2)] transition-colors">
               Kontakt
             </a>
           </nav>
@@ -181,19 +196,30 @@ export function App() {
               href={CONTACT_INFO.reservantoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#151515] text-[#F5F3EE] hover:bg-[#262626] text-sm font-medium shadow-sm border border-[#8B2E2E]/50 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--c-ink)] text-[var(--c-paper)] hover:bg-[var(--c-g26)] text-sm font-medium shadow-sm border border-[var(--c-acc)]/50 transition-all"
             >
-              <Calendar className="w-4 h-4 text-[#E3A59B]" />
+              <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
               <span>Rezervace kurzů</span>
-              <ExternalLink className="w-3.5 h-3.5 text-[#E3A59B]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
             </a>
           </div>
+
+          {/* Theme toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Přepnout na světlý režim' : 'Přepnout na tmavý režim'}
+            title={theme === 'dark' ? 'Světlý režim' : 'Tmavý režim'}
+            className="p-2.5 rounded-full border border-[var(--c-line)] text-[var(--c-ink)] hover:bg-[var(--c-alt2)] transition-colors cursor-pointer"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
 
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Otevřít menu"
-            className="lg:hidden p-2.5 rounded-lg border border-[#D3CFC5] text-[#151515] hover:bg-[#E8E5DD]"
+            className="lg:hidden p-2.5 rounded-lg border border-[var(--c-line)] text-[var(--c-ink)] hover:bg-[var(--c-alt2)]"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -201,7 +227,7 @@ export function App() {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#FAFAF7] border-b border-[#D6D2C8] px-4 pt-3 pb-6 space-y-2 shadow-xl">
+          <div className="lg:hidden bg-[var(--c-paper)] border-b border-[var(--c-line)] px-4 pt-3 pb-6 space-y-2 shadow-xl">
             {[
               { href: '#sluzby', label: 'Co nabízíme' },
               { href: '#kurzy', label: 'Kurzy čalounění a výroba taburetu' },
@@ -216,7 +242,7 @@ export function App() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="block py-2.5 px-3 rounded-lg text-base font-medium text-[#1C1C1C] hover:bg-[#E8E5DD]"
+                className="block py-2.5 px-3 rounded-lg text-base font-medium text-[var(--c-ink)] hover:bg-[var(--c-alt2)]"
               >
                 {link.label}
               </a>
@@ -227,17 +253,17 @@ export function App() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#151515] text-[#F5F3EE] font-medium border border-[#8B2E2E]/50"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[var(--c-ink)] text-[var(--c-paper)] font-medium border border-[var(--c-acc)]/50"
               >
-                <Calendar className="w-4 h-4 text-[#E3A59B]" />
+                <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
                 <span>Rezervace termínů kurzů</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#E3A59B]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
               </a>
               <a
                 href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[#8B2E2E] text-[#151515] font-medium"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[var(--c-acc)] text-[var(--c-ink)] font-medium"
               >
-                <Phone className="w-4 h-4 text-[#6E1F1F]" />
+                <Phone className="w-4 h-4 text-[var(--c-acc2)]" />
                 <span>Zavolat: {CONTACT_INFO.phoneMainDisplay}</span>
               </a>
             </div>
@@ -246,28 +272,28 @@ export function App() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-linen pt-10 pb-20 lg:pt-16 lg:pb-28 border-b border-[#D6D2C8]">
+      <section className="relative overflow-hidden bg-linen pt-10 pb-20 lg:pt-16 lg:pb-28 border-b border-[var(--c-line)]">
         {/* Decorative warm glow */}
-        <div className="pointer-events-none absolute -top-32 right-0 w-[34rem] h-[34rem] rounded-full bg-[#8B2E2E]/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-10 w-[26rem] h-[26rem] rounded-full bg-[#6E1F1F]/8 blur-3xl" />
+        <div className="pointer-events-none absolute -top-32 right-0 w-[34rem] h-[34rem] rounded-full bg-[var(--c-acc)]/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-10 w-[26rem] h-[26rem] rounded-full bg-[var(--c-acc2)]/8 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* Hero Copy (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#E8E5DD] border border-[#8B2E2E]/40 text-[#4A1515] text-xs sm:text-sm font-medium">
-                <Award className="w-4 h-4 text-[#6E1F1F]" />
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[var(--c-alt2)] border border-[var(--c-acc)]/40 text-[var(--c-acc3)] text-xs sm:text-sm font-medium">
+                <Award className="w-4 h-4 text-[var(--c-acc2)]" />
                 <span>Téměř 30 let zkušeností • Tradice 3. generace čalouníků</span>
               </div>
 
-              <h1 className="font-serif text-4xl sm:text-6xl lg:text-[4.15rem] font-semibold text-[#151515] leading-[1.08] tracking-tight">
+              <h1 className="font-serif text-4xl sm:text-6xl lg:text-[4.15rem] font-semibold text-[var(--c-ink)] leading-[1.08] tracking-tight">
                 Dáváme věcem{' '}
-                <span className="italic font-normal text-[#6E1F1F]">nový život</span> a vašemu
+                <span className="italic font-normal text-[var(--c-acc2)]">nový život</span> a vašemu
                 interiéru duši.
               </h1>
 
-              <p className="text-base sm:text-lg text-[#444444] leading-relaxed max-w-2xl">
-                Jmenuji se <strong className="font-semibold text-[#151515]">Ladislav Tobiášek</strong>.
+              <p className="text-base sm:text-lg text-[var(--c-g44)] leading-relaxed max-w-2xl">
+                Jmenuji se <strong className="font-semibold text-[var(--c-ink)]">Ladislav Tobiášek</strong>.
                 V čalounické a restaurátorské dílně <strong>Charivari Home</strong> v Nové Vsi u
                 Mělníka propojujeme tradiční rukodělné postupy mého pradědy Františka s moderními
                 požadavky na funkčnost a estetiku. Přijďte si k nám vlastnoručně zrenovovat kus
@@ -280,45 +306,45 @@ export function App() {
                   href={CONTACT_INFO.reservantoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#151515] hover:bg-[#262626] text-[#FAFAF7] font-medium text-base shadow-lg shadow-[#151515]/15 border border-[#8B2E2E]/60 transition-all group"
+                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-base shadow-lg shadow-[var(--c-ink)]/15 border border-[var(--c-acc)]/60 transition-all group"
                 >
-                  <Calendar className="w-5 h-5 text-[#E3A59B]" />
+                  <Calendar className="w-5 h-5 text-[var(--c-icon)]" />
                   <span>Rezervace termínů kurzů</span>
-                  <ExternalLink className="w-4 h-4 text-[#E3A59B] group-hover:translate-x-0.5 transition-transform" />
+                  <ExternalLink className="w-4 h-4 text-[var(--c-icon)] group-hover:translate-x-0.5 transition-transform" />
                 </a>
 
                 <a
                   href="#restaurovani"
-                  className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full bg-[#FAFAF7] hover:bg-[#E8E5DD] text-[#151515] font-medium text-base border border-[#8B2E2E]/50 transition-all"
+                  className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-base border border-[var(--c-acc)]/50 transition-all"
                 >
-                  <Hammer className="w-4 h-4 text-[#6E1F1F]" />
+                  <Hammer className="w-4 h-4 text-[var(--c-acc2)]" />
                   <span>Zakázkové restaurování</span>
                 </a>
               </div>
 
               {/* Key Trust Metrics */}
-              <div className="pt-6 grid grid-cols-3 gap-4 sm:gap-8 border-t border-[#D8D4CA] max-w-xl">
+              <div className="pt-6 grid grid-cols-3 gap-4 sm:gap-8 border-t border-[var(--c-line)] max-w-xl">
                 <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#151515]">
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
                     ~90 let
                   </div>
-                  <div className="text-xs sm:text-sm text-[#5E5E5E]">
+                  <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
                     rodinných kořenů v čalounění
                   </div>
                 </div>
                 <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#151515]">
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
                     1 den
                   </div>
-                  <div className="text-xs sm:text-sm text-[#5E5E5E]">
+                  <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
                     stačí k výrobě vlastního taburetu
                   </div>
                 </div>
                 <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#151515]">
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
                     100%
                   </div>
-                  <div className="text-xs sm:text-sm text-[#5E5E5E]">
+                  <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
                     poctivá ruční práce a materiály
                   </div>
                 </div>
@@ -329,7 +355,7 @@ export function App() {
             <div className="lg:col-span-5 relative">
               <div className="grid grid-cols-12 gap-4 items-center">
                 {/* Main Workshop / Course Image */}
-                <div className="col-span-7 relative rounded-2xl overflow-hidden shadow-xl border-4 border-[#FAFAF7] bg-[#1C1C1C] aspect-[4/5]">
+                <div className="col-span-7 relative rounded-2xl overflow-hidden shadow-xl border-4 border-[var(--c-paper)] bg-[#1C1C1C] aspect-[4/5]">
                   <img
                     src="/images/service-kurzy.jpg"
                     alt="Kurzy čalounění Charivari Home"
@@ -348,14 +374,14 @@ export function App() {
 
                 {/* Stacked Secondary Images */}
                 <div className="col-span-5 space-y-4">
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[#FAFAF7] aspect-square">
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[var(--c-paper)] aspect-square">
                     <img
                       src="/images/rest-kreslo.jpg"
                       alt="Restaurované křeslo"
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[#FAFAF7] aspect-[4/5]">
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[var(--c-paper)] aspect-[4/5]">
                     <img
                       src="/images/hist-1-frantisek.jpg"
                       alt="Praděda František a děda Ladislav"
@@ -379,16 +405,16 @@ export function App() {
       </section>
 
       {/* 4 PILLARS OVERVIEW (Co v dílně nabízíme) */}
-      <section id="sluzby" className="py-20 bg-[#FAFAF7]">
+      <section id="sluzby" className="py-20 bg-[var(--c-paper)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6E1F1F]">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
               Řemeslo pod jednou střechou
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#151515] mt-2">
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
               Čtyři pilíře dílny Charivari Home
             </h2>
-            <p className="text-[#555555] mt-3 text-base sm:text-lg">
+            <p className="text-[var(--c-g55)] mt-3 text-base sm:text-lg">
                *Charivari* je slovo, které v sobě nese pestrost, rozmanitost a radost. Máme úctu k
               barokním křeslům, ikonickému designu 20. století i historickým vozům.
             </p>
@@ -438,7 +464,7 @@ export function App() {
                 <a
                   key={card.title}
                   href={card.href}
-                  className="group bg-[#EFEDE6] rounded-2xl overflow-hidden border border-[#D6D2C8] hover:border-[#8B2E2E] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                  className="group bg-[var(--c-alt)] rounded-2xl overflow-hidden border border-[var(--c-line)] hover:border-[var(--c-acc)] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
                   <div className="relative h-56 overflow-hidden bg-[#1C1C1C]">
                     <img
@@ -446,23 +472,23 @@ export function App() {
                       alt={card.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-[#121212]/85 backdrop-blur-sm border border-[#8B2E2E]/50 flex items-center justify-center text-[#E3A59B]">
+                    <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-[#121212]/85 backdrop-blur-sm border border-[var(--c-acc)]/50 flex items-center justify-center text-[#E3A59B]">
                       <IconComponent className="w-5 h-5" />
                     </div>
                   </div>
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-[#6E1F1F]">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--c-acc2)]">
                         {card.subtitle}
                       </span>
-                      <h3 className="font-serif text-2xl font-semibold text-[#151515] mt-1 group-hover:text-[#6E1F1F] transition-colors">
+                      <h3 className="font-serif text-2xl font-semibold text-[var(--c-ink)] mt-1 group-hover:text-[var(--c-acc2)] transition-colors">
                         {card.title}
                       </h3>
-                      <p className="text-sm text-[#555555] mt-2.5 leading-relaxed">{card.desc}</p>
+                      <p className="text-sm text-[var(--c-g55)] mt-2.5 leading-relaxed">{card.desc}</p>
                     </div>
-                    <div className="mt-5 pt-4 border-t border-[#D6D2C8] flex items-center justify-between text-sm font-semibold text-[#151515]">
+                    <div className="mt-5 pt-4 border-t border-[var(--c-line)] flex items-center justify-between text-sm font-semibold text-[var(--c-ink)]">
                       <span>{card.cta}</span>
-                      <ArrowRight className="w-4 h-4 text-[#6E1F1F] group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 text-[var(--c-acc2)] group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </a>
@@ -473,17 +499,17 @@ export function App() {
       </section>
 
       {/* COURSES SECTION (Kurzy čalounění a výroba taburetu) */}
-      <section id="kurzy" className="py-24 bg-[#EFEDE6] border-y border-[#D6D2C8]">
+      <section id="kurzy" className="py-24 bg-[var(--c-alt)] border-y border-[var(--c-line)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
             <div className="max-w-2xl">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6E1F1F]">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
                 Zážitkové řemeslné kurzy v Nové Vsi u Mělníka
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#151515] mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
                 Naučte se řemeslo, které dává smysl
               </h2>
-              <p className="text-[#444444] mt-3 text-base sm:text-lg">
+              <p className="text-[var(--c-g44)] mt-3 text-base sm:text-lg">
                 „V Charivari nevyrábíme jen věci. Měníme způsob, jakým se díváte na svůj interiér. Z
                 věcí, které ostatní vyhazují, u nás společně tvoříme poklady.“
               </p>
@@ -493,11 +519,11 @@ export function App() {
                 href={CONTACT_INFO.reservantoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#151515] hover:bg-[#262626] text-[#FAFAF7] font-medium text-sm shadow-md border border-[#8B2E2E]/50"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm shadow-md border border-[var(--c-acc)]/50"
               >
-                <Calendar className="w-4 h-4 text-[#E3A59B]" />
+                <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
                 <span>Zobrazit volné termíny v kalendáři</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#E3A59B]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
               </a>
             </div>
           </div>
@@ -507,7 +533,7 @@ export function App() {
             {COURSES.map((course) => (
               <div
                 key={course.id}
-                className="bg-[#FAFAF7] rounded-3xl overflow-hidden border border-[#CFCABD] shadow-md flex flex-col justify-between"
+                className="bg-[var(--c-paper)] rounded-3xl overflow-hidden border border-[var(--c-line2)] shadow-md flex flex-col justify-between"
               >
                 <div>
                   {/* Course Header Image */}
@@ -519,7 +545,7 @@ export function App() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/85 via-[#121212]/25 to-transparent" />
                     <div className="absolute top-4 left-4">
-                      <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#121212]/90 text-[#E3A59B] border border-[#8B2E2E]/50">
+                      <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#121212]/90 text-[#E3A59B] border border-[var(--c-acc)]/50">
                         {course.badge}
                       </span>
                     </div>
@@ -533,8 +559,8 @@ export function App() {
                           {course.title}
                         </h3>
                       </div>
-                      <div className="text-right shrink-0 bg-[#121212]/90 px-4 py-2 rounded-2xl border border-[#8B2E2E]/40">
-                        <span className="block text-[10px] uppercase tracking-wider text-[#8B2E2E]">
+                      <div className="text-right shrink-0 bg-[#121212]/90 px-4 py-2 rounded-2xl border border-[var(--c-acc)]/40">
+                        <span className="block text-[10px] uppercase tracking-wider text-[var(--c-acc)]">
                           Cena kurzu
                         </span>
                         <span className="font-serif text-2xl font-bold text-[#FAFAF7]">
@@ -546,29 +572,29 @@ export function App() {
 
                   {/* Course Body */}
                   <div className="p-6 sm:p-8 space-y-6">
-                    <p className="text-[#444444] text-base leading-relaxed">{course.description}</p>
+                    <p className="text-[var(--c-g44)] text-base leading-relaxed">{course.description}</p>
 
                     <div className="space-y-2.5">
-                      <h4 className="font-serif text-xl font-semibold text-[#151515]">
+                      <h4 className="font-serif text-xl font-semibold text-[var(--c-ink)]">
                         Co vás na kurzu čeká:
                       </h4>
                       <ul className="space-y-2">
                         {course.highlights.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2.5 text-sm text-[#2E2E2E]">
-                            <CheckCircle2 className="w-4 h-4 text-[#6E1F1F] shrink-0 mt-0.5" />
+                          <li key={idx} className="flex items-start gap-2.5 text-sm text-[var(--c-g2e)]">
+                            <CheckCircle2 className="w-4 h-4 text-[var(--c-acc2)] shrink-0 mt-0.5" />
                             <span>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-[#EFEDE6] border border-[#D6D2C8] space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-wider text-[#6E1F1F]">
+                    <div className="p-4 rounded-2xl bg-[var(--c-alt)] border border-[var(--c-line)] space-y-2">
+                      <div className="text-xs font-bold uppercase tracking-wider text-[var(--c-acc2)]">
                         Co si vzít s sebou &amp; jak je to s látkou?
                       </div>
-                      <p className="text-sm text-[#2E2E2E] font-medium">{course.whatToBring}</p>
+                      <p className="text-sm text-[var(--c-g2e)] font-medium">{course.whatToBring}</p>
                       {course.fabricInfo.map((info, i) => (
-                        <p key={i} className="text-xs sm:text-sm text-[#555555]">
+                        <p key={i} className="text-xs sm:text-sm text-[var(--c-g55)]">
                           • {info}
                         </p>
                       ))}
@@ -582,17 +608,17 @@ export function App() {
                     href={CONTACT_INFO.reservantoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#151515] hover:bg-[#262626] text-[#FAFAF7] font-medium text-sm border border-[#8B2E2E]/50 transition-all"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm border border-[var(--c-acc)]/50 transition-all"
                   >
-                    <Calendar className="w-4 h-4 text-[#E3A59B]" />
+                    <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
                     <span>Rezervovat termín ({course.price})</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#E3A59B]" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
                   </a>
                   <a
                     href="#poukazy"
-                    className="inline-flex items-center justify-center gap-1.5 py-3.5 px-4 rounded-xl border border-[#8B2E2E]/60 text-[#151515] hover:bg-[#E8E5DD] text-sm font-medium transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 py-3.5 px-4 rounded-xl border border-[var(--c-acc)]/60 text-[var(--c-ink)] hover:bg-[var(--c-alt2)] text-sm font-medium transition-all"
                   >
-                    <Gift className="w-4 h-4 text-[#6E1F1F]" />
+                    <Gift className="w-4 h-4 text-[var(--c-acc2)]" />
                     <span>Koupit jako poukaz</span>
                   </a>
                 </div>
@@ -601,16 +627,16 @@ export function App() {
           </div>
 
           {/* Workshop Comfort Banner */}
-          <div className="mt-10 bg-[#FAFAF7] rounded-2xl p-6 sm:p-8 border border-[#CFCABD] grid sm:grid-cols-3 gap-6">
+          <div className="mt-10 bg-[var(--c-paper)] rounded-2xl p-6 sm:p-8 border border-[var(--c-line2)] grid sm:grid-cols-3 gap-6">
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#E8E5DD] flex items-center justify-center text-[#6E1F1F] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
                 <Scissors className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-serif text-lg font-semibold text-[#151515]">
+                <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
                   Ochranné pomůcky a nářadí k zapůjčení
                 </h4>
-                <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+                <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
                   U nás se práší a občas i barví – v dílně jsou pro vás k zapůjčení zástěry,
                   pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka i veškeré
                   profesionální nářadí.
@@ -618,28 +644,28 @@ export function App() {
               </div>
             </div>
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#E8E5DD] flex items-center justify-center text-[#6E1F1F] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
                 <Coffee className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-serif text-lg font-semibold text-[#151515]">
+                <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
                   Káva, čaj a občerstvení zdarma
                 </h4>
-                <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+                <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
                   Po celý den je pro vás v dílně zdarma k dispozici káva, čaj, drobné občerstvení,
                   dobrá nálada a špetka trpělivosti.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#E8E5DD] flex items-center justify-center text-[#6E1F1F] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-serif text-lg font-semibold text-[#151515]">
+                <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
                   Vzorníky látek přímo na místě
                 </h4>
-                <p className="text-xs sm:text-sm text-[#555555] mt-0.5">
+                <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
                   Nechce se vám nic shánět? V dílně máme mnoho vzorníků kvalitních potahových látek,
                   které si můžete osahat a přiložit k nábytku.
                 </p>
@@ -650,18 +676,18 @@ export function App() {
       </section>
 
       {/* ZAKÁZKOVÉ RESTAUROVÁNÍ SECTION */}
-      <section id="restaurovani" className="py-24 bg-[#FAFAF7]">
+      <section id="restaurovani" className="py-24 bg-[var(--c-paper)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Left Content (6 cols) */}
             <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6E1F1F]">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
                 Zakázkové restaurování a čalounění
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#151515] leading-tight">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
                 Zachováváme historickou patinu a duši nábytku
               </h2>
-              <p className="text-[#444444] text-base sm:text-lg leading-relaxed">
+              <p className="text-[var(--c-g44)] text-base sm:text-lg leading-relaxed">
                 Mým cílem není vytvořit nový kus nábytku, ale restaurovat ho tak, aby byla zachována
                 jeho historická patina a duše, a přitom byl plně využitelný pro moderní interiér.
                 Používám tradiční materiály jako jsou <strong>africká tráva</strong>,{' '}
@@ -690,12 +716,12 @@ export function App() {
                 ].map((item) => (
                   <div
                     key={item.title}
-                    className="p-5 rounded-2xl bg-[#EFEDE6] border border-[#D6D2C8]"
+                    className="p-5 rounded-2xl bg-[var(--c-alt)] border border-[var(--c-line)]"
                   >
-                    <h3 className="font-serif text-xl font-semibold text-[#151515]">
+                    <h3 className="font-serif text-xl font-semibold text-[var(--c-ink)]">
                       {item.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#555555] mt-1.5 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-1.5 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -729,14 +755,14 @@ export function App() {
             {/* Right Image Mosaic (6 cols) */}
             <div className="lg:col-span-6 grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#D6D2C8] aspect-[4/5]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/5]">
                   <img
                     src="/images/rest-1.jpg"
                     alt="Tradiční vyvazování pružin"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#D6D2C8] aspect-[4/3]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/3]">
                   <img
                     src="/images/rest-modre-zidle.jpg"
                     alt="Zrestaurované modré židle"
@@ -745,14 +771,14 @@ export function App() {
                 </div>
               </div>
               <div className="space-y-4 pt-6">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#D6D2C8] aspect-[4/3]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/3]">
                   <img
                     src="/images/rest-2.jpg"
                     alt="Zakázkové čalounění křesla"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#D6D2C8] aspect-[4/5]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/5]">
                   <img
                     src="/images/rest-lavice.jpg"
                     alt="Čalouněná lavice na míru"
@@ -879,12 +905,12 @@ export function App() {
       </section>
 
       {/* GIFT VOUCHERS SECTION (Dárkové poukazy s konfigurátorem) */}
-      <section id="poukazy" className="py-24 bg-[#EFEDE6] border-b border-[#D6D2C8]">
+      <section id="poukazy" className="py-24 bg-[var(--c-alt)] border-b border-[var(--c-line)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Voucher Visual Preview (6 cols) */}
             <div className="lg:col-span-6 space-y-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-[#FAFAF7] bg-[#121212]">
+              <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-[var(--c-paper)] bg-[#121212]">
                 <img
                   src="/images/voucher.jpg"
                   alt="Dárkový voucher Charivari Home"
@@ -893,27 +919,27 @@ export function App() {
               </div>
 
               {/* Live Dedication Preview Card */}
-              <div className="p-6 rounded-2xl bg-[#FAFAF7] border border-[#8B2E2E]/50 shadow-sm">
-                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-[#6E1F1F] font-semibold mb-2">
+              <div className="p-6 rounded-2xl bg-[var(--c-paper)] border border-[var(--c-acc)]/50 shadow-sm">
+                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-[var(--c-acc2)] font-semibold mb-2">
                   <span>Náhled vašeho zadání na voucher</span>
                   <span>Platnost: 1 rok</span>
                 </div>
-                <div className="font-serif text-xl font-semibold text-[#151515]">
+                <div className="font-serif text-xl font-semibold text-[var(--c-ink)]">
                   {selectedVoucherCourse === '3300'
                     ? 'Kurz Renovace a čalounění nábytku (3 300 Kč)'
                     : 'Kurz Výroba čalouněného taburetu (3 900 Kč)'}
                 </div>
                 {voucherRecipient && (
-                  <p className="text-sm text-[#2E2E2E] mt-1">
+                  <p className="text-sm text-[var(--c-g2e)] mt-1">
                     <strong>Pro koho:</strong> {voucherRecipient}
                   </p>
                 )}
                 {voucherDedication ? (
-                  <p className="font-serif italic text-base text-[#555555] mt-2 border-l-2 border-[#8B2E2E] pl-3">
+                  <p className="font-serif italic text-base text-[var(--c-g55)] mt-2 border-l-2 border-[var(--c-acc)] pl-3">
                     „{voucherDedication}“
                   </p>
                 ) : (
-                  <p className="text-xs text-[#777777] mt-1.5">
+                  <p className="text-xs text-[var(--c-g77)] mt-1.5">
                     Na voucher vám rádi napíšeme osobní věnování a můžeme přidat i vámi zaslanou
                     fotografii.
                   </p>
@@ -923,16 +949,16 @@ export function App() {
 
             {/* Voucher Interactive Order Box (6 cols) */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAFAF7] border border-[#8B2E2E]/40 text-[#6E1F1F] text-xs font-semibold">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--c-paper)] border border-[var(--c-acc)]/40 text-[var(--c-acc2)] text-xs font-semibold">
                 <Gift className="w-3.5 h-3.5" />
                 <span>Dárkové poukazy s platností 1 rok</span>
               </div>
 
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#151515] leading-tight">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
                 Darujte zážitek, který zůstane doma napořád
               </h2>
 
-              <p className="text-[#444444] text-base leading-relaxed">
+              <p className="text-[var(--c-g44)] text-base leading-relaxed">
                 Nabízíme nákup dárkového voucheru pro vás, vaše blízké či kolegy. Na vouchery píšeme
                 osobní věnování a můžeme na ně umístit například i zaslanou fotografii křesla či
                 obdarovaného.
@@ -940,7 +966,7 @@ export function App() {
 
               {/* Step 1: Select Course */}
               <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#555555]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--c-g55)]">
                   1. Vyberte typ kurzu na poukaz:
                 </label>
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -949,12 +975,12 @@ export function App() {
                     onClick={() => setSelectedVoucherCourse('3300')}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedVoucherCourse === '3300'
-                        ? 'bg-[#151515] text-[#FAFAF7] border-[#8B2E2E] shadow-md'
-                        : 'bg-[#FAFAF7] text-[#151515] border-[#CFCABD] hover:border-[#8B2E2E]'
+                        ? 'bg-[var(--c-ink)] text-[var(--c-paper)] border-[var(--c-acc)] shadow-md'
+                        : 'bg-[var(--c-paper)] text-[var(--c-ink)] border-[var(--c-line2)] hover:border-[var(--c-acc)]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wider text-[#8B2E2E] font-semibold">
+                      <span className="text-xs uppercase tracking-wider text-[var(--c-acc)] font-semibold">
                         Vlastní kus nábytku
                       </span>
                       <span className="font-serif text-xl font-bold">3 300 Kč</span>
@@ -969,12 +995,12 @@ export function App() {
                     onClick={() => setSelectedVoucherCourse('3900')}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedVoucherCourse === '3900'
-                        ? 'bg-[#151515] text-[#FAFAF7] border-[#8B2E2E] shadow-md'
-                        : 'bg-[#FAFAF7] text-[#151515] border-[#CFCABD] hover:border-[#8B2E2E]'
+                        ? 'bg-[var(--c-ink)] text-[var(--c-paper)] border-[var(--c-acc)] shadow-md'
+                        : 'bg-[var(--c-paper)] text-[var(--c-ink)] border-[var(--c-line2)] hover:border-[var(--c-acc)]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wider text-[#8B2E2E] font-semibold">
+                      <span className="text-xs uppercase tracking-wider text-[var(--c-acc)] font-semibold">
                         Materiál v ceně
                       </span>
                       <span className="font-serif text-xl font-bold">3 900 Kč</span>
@@ -988,7 +1014,7 @@ export function App() {
 
               {/* Step 2: Optional Personalization */}
               <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#555555]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--c-g55)]">
                   2. Osobní věnování (nepovinné – připraví text do objednávky):
                 </label>
                 <input
@@ -997,7 +1023,7 @@ export function App() {
                   value={voucherRecipient}
                   onChange={(e) => setVoucherRecipient(sanitizeInput(e.target.value, 100))}
                   placeholder="Jméno obdarovaného (např. Pro maminku k narozeninám)"
-                  className="w-full px-4 py-3 rounded-xl bg-[#FAFAF7] border border-[#CFCABD] focus:outline-none focus:border-[#6E1F1F] text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-[var(--c-paper)] border border-[var(--c-line2)] focus:outline-none focus:border-[var(--c-acc2)] text-sm"
                 />
                 <textarea
                   rows={2}
@@ -1005,7 +1031,7 @@ export function App() {
                   value={voucherDedication}
                   onChange={(e) => setVoucherDedication(sanitizeInput(e.target.value, 300))}
                   placeholder="Váš text věnování na voucher..."
-                  className="w-full px-4 py-3 rounded-xl bg-[#FAFAF7] border border-[#CFCABD] focus:outline-none focus:border-[#6E1F1F] text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-[var(--c-paper)] border border-[var(--c-line2)] focus:outline-none focus:border-[var(--c-acc2)] text-sm"
                 />
               </div>
 
@@ -1015,18 +1041,18 @@ export function App() {
                   href={CONTACT_INFO.reservantoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#151515] hover:bg-[#262626] text-[#FAFAF7] font-medium text-sm border border-[#8B2E2E]/50 shadow-md transition-all"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm border border-[var(--c-acc)]/50 shadow-md transition-all"
                 >
-                  <Calendar className="w-4 h-4 text-[#E3A59B]" />
+                  <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
                   <span>Přejít do rezervačního systému</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[#E3A59B]" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
                 </a>
                 <button
                   type="button"
                   onClick={handleVoucherMailto}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[#FAFAF7] hover:bg-[#E8E5DD] text-[#151515] font-medium text-sm border border-[#8B2E2E]/60 transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-sm border border-[var(--c-acc)]/60 transition-all cursor-pointer"
                 >
-                  <Mail className="w-4 h-4 text-[#6E1F1F]" />
+                  <Mail className="w-4 h-4 text-[var(--c-acc2)]" />
                   <span>Objednat e-mailem</span>
                 </button>
               </div>
@@ -1036,17 +1062,17 @@ export function App() {
       </section>
 
       {/* FAMILY HISTORY & ABOUT ME SECTION (Rodinná historie & O mně) */}
-      <section id="historie" className="py-24 bg-[#FAFAF7]">
+      <section id="historie" className="py-24 bg-[var(--c-paper)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E8E5DD] border border-[#8B2E2E]/40 text-[#6E1F1F] text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--c-alt2)] border border-[var(--c-acc)]/40 text-[var(--c-acc2)] text-xs font-semibold">
               <History className="w-3.5 h-3.5" />
               <span>Rodinná tradice • Praha 7 Holešovice &rarr; Nová Ves u Mělníka</span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#151515] mt-3">
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-3">
               Příběh psaný třemi generacemi
             </h2>
-            <p className="text-[#444444] mt-4 text-base sm:text-lg leading-relaxed">
+            <p className="text-[var(--c-g44)] mt-4 text-base sm:text-lg leading-relaxed">
               Jmenuji se <strong>Ladislav Tobiášek</strong> a restaurování a čalounění se věnuji
               téměř 30 let. Tento obor vnímám nejen jako práci, ale především jako poslání uchovat
               hodnoty vytvořené generacemi před námi. Moje cesta k řemeslu začala u mého pradědy{' '}
@@ -1070,28 +1096,28 @@ export function App() {
                     description: photo.caption,
                   })
                 }
-                className="group bg-[#EFEDE6] rounded-3xl overflow-hidden border border-[#CFCABD] hover:border-[#8B2E2E] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
+                className="group bg-[var(--c-alt)] rounded-3xl overflow-hidden border border-[var(--c-line2)] hover:border-[var(--c-acc)] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
               >
-                <div className="relative h-80 overflow-hidden bg-[#151515] p-3">
+                <div className="relative h-80 overflow-hidden bg-[var(--c-ink)] p-3">
                   <img
                     src={photo.src}
                     alt={photo.title}
                     className="w-full h-full object-contain rounded-2xl archival-photo"
                   />
-                  <div className="absolute top-6 left-6 px-3 py-1 rounded-full bg-[#121212]/85 text-[#E3A59B] text-xs font-medium border border-[#8B2E2E]/40">
+                  <div className="absolute top-6 left-6 px-3 py-1 rounded-full bg-[#121212]/85 text-[#E3A59B] text-xs font-medium border border-[var(--c-acc)]/40">
                     {index + 1}. {photo.era}
                   </div>
                 </div>
                 <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-serif text-2xl font-semibold text-[#151515]">
+                    <h3 className="font-serif text-2xl font-semibold text-[var(--c-ink)]">
                       {photo.title}
                     </h3>
-                    <p className="text-[#444444] text-sm sm:text-base mt-2 leading-relaxed">
+                    <p className="text-[var(--c-g44)] text-sm sm:text-base mt-2 leading-relaxed">
                       {photo.caption}
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-[#D6D2C8] text-xs font-semibold uppercase tracking-wider text-[#6E1F1F] flex items-center justify-between">
+                  <div className="mt-4 pt-3 border-t border-[var(--c-line)] text-xs font-semibold uppercase tracking-wider text-[var(--c-acc2)] flex items-center justify-between">
                     <span>Rodinný archiv Tobiáškových</span>
                     <span>Kliknutím zvětšíte &rarr;</span>
                   </div>
@@ -1103,14 +1129,14 @@ export function App() {
       </section>
 
       {/* INTERACTIVE GALLERY SECTION */}
-      <section id="galerie" className="py-24 bg-[#EFEDE6] border-t border-[#D6D2C8]">
+      <section id="galerie" className="py-24 bg-[var(--c-alt)] border-t border-[var(--c-line)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#6E1F1F]">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
                 Portfolio &amp; Ukázky prací
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#151515] mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
                 Galerie z naší dílny
               </h2>
             </div>
@@ -1132,8 +1158,8 @@ export function App() {
                   }}
                   className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                     activeGalleryCategory === tab.id
-                      ? 'bg-[#151515] text-[#FAFAF7] shadow-sm border border-[#8B2E2E]'
-                      : 'bg-[#FAFAF7] text-[#444444] hover:bg-[#E8E5DD] border border-[#CFCABD]'
+                      ? 'bg-[var(--c-ink)] text-[var(--c-paper)] shadow-sm border border-[var(--c-acc)]'
+                      : 'bg-[var(--c-paper)] text-[var(--c-g44)] hover:bg-[var(--c-alt2)] border border-[var(--c-line2)]'
                   }`}
                 >
                   {tab.label}
@@ -1148,7 +1174,7 @@ export function App() {
               <div
                 key={item.id}
                 onClick={() => setLightboxItem(item)}
-                className="group relative rounded-2xl overflow-hidden bg-[#151515] border border-[#CFCABD] aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all"
+                className="group relative rounded-2xl overflow-hidden bg-[var(--c-ink)] border border-[var(--c-line2)] aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all"
               >
                 <img
                   src={item.src}
@@ -1166,7 +1192,7 @@ export function App() {
                       ? 'Autoveteráni'
                       : 'Rodinná historie'}
                   </span>
-                  <h4 className="font-serif text-base sm:text-lg text-[#FAFAF7] leading-snug">
+                  <h4 className="font-serif text-base sm:text-lg text-[var(--c-paper)] leading-snug">
                     {item.title}
                   </h4>
                 </div>
@@ -1179,7 +1205,7 @@ export function App() {
             <div className="mt-10 text-center">
               <button
                 onClick={() => setShowAllGallery(!showAllGallery)}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FAFAF7] hover:bg-[#E8E5DD] text-[#151515] font-medium text-sm border border-[#8B2E2E]/60 shadow-sm transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-sm border border-[var(--c-acc)]/60 shadow-sm transition-all cursor-pointer"
               >
                 <span>
                   {showAllGallery
