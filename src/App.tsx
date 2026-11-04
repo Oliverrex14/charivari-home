@@ -95,11 +95,11 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FAF6F0] text-[#1F1A17]">
+    <div className="min-h-screen flex flex-col bg-[#141210] text-[#F2EBDD]">
       {/* Top Heritage Bar */}
-      <div className="bg-[#181310] text-[#E6DDD3] text-xs sm:text-sm py-2.5 px-4 border-b border-[#C69C49]/25">
+      <div className="bg-[#0A0908] text-[#E6DDD3] text-xs sm:text-sm py-2.5 px-4 border-b border-[#D4AF63]/25">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-[#DFB968]">
+          <div className="flex items-center gap-2 text-[#E6C27A]">
             <Sparkles className="w-3.5 h-3.5 shrink-0" />
             <span className="font-medium tracking-wide">
               Rodinná čalounická a restaurátorská dílna Ladislava Tobiáška
@@ -108,17 +108,17 @@ export function App() {
           <div className="flex items-center gap-5 text-xs sm:text-sm">
             <a
               href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-              className="flex items-center gap-1.5 hover:text-[#DFB968] transition-colors"
+              className="flex items-center gap-1.5 hover:text-[#E6C27A] transition-colors"
             >
-              <Phone className="w-3.5 h-3.5 text-[#C69C49]" />
+              <Phone className="w-3.5 h-3.5 text-[#D4AF63]" />
               <span>{CONTACT_INFO.phoneMainDisplay}</span>
             </a>
-            <span className="hidden md:inline text-[#C69C49]/40">|</span>
+            <span className="hidden md:inline text-[#D4AF63]/40">|</span>
             <a
               href="#kontakt"
-              className="hidden md:flex items-center gap-1.5 hover:text-[#DFB968] transition-colors"
+              className="hidden md:flex items-center gap-1.5 hover:text-[#E6C27A] transition-colors"
             >
-              <MapPin className="w-3.5 h-3.5 text-[#C69C49]" />
+              <MapPin className="w-3.5 h-3.5 text-[#D4AF63]" />
               <span>{CONTACT_INFO.address}</span>
             </a>
           </div>
@@ -126,11 +126,11 @@ export function App() {
       </div>
 
       {/* Main Sticky Header */}
-      <header className="sticky top-0 z-40 bg-[#FAF6F0]/95 backdrop-blur-md border-b border-[#E2D7C5] transition-all">
+      <header className="sticky top-0 z-40 bg-[#141210]/95 backdrop-blur-md border-b border-[#33291F] transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
           {/* Brand Logo */}
           <a href="#" className="flex items-center gap-3.5 group">
-            <div className="w-14 h-12 rounded-lg overflow-hidden border border-[#C69C49]/40 bg-[#181310] shadow-sm shrink-0">
+            <div className="w-14 h-12 rounded-lg overflow-hidden border border-[#D4AF63]/40 bg-[#0A0908] shadow-sm shrink-0">
               <img
                 src="/images/logo-zlate.jpg"
                 alt="CHARIVARI HOME logo"
@@ -138,39 +138,39 @@ export function App() {
               />
             </div>
             <div>
-              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-wider text-[#1F1A17] leading-none">
+              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-wider text-[#F2EBDD] leading-none">
                 CHARIVARI HOME
               </span>
-              <span className="block text-[11px] uppercase tracking-[0.18em] text-[#7A6A58] mt-1">
+              <span className="block text-[11px] uppercase tracking-[0.18em] text-[#9A8E7C] mt-1">
                 Restaurování &amp; Kurzy čalounění
               </span>
             </div>
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[#3D332C]">
-            <a href="#sluzby" className="hover:text-[#9E7425] transition-colors">
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[#D9D0C2]">
+            <a href="#sluzby" className="hover:text-[#D9B45F] transition-colors">
               Co nabízíme
             </a>
-            <a href="#kurzy" className="hover:text-[#9E7425] transition-colors">
+            <a href="#kurzy" className="hover:text-[#D9B45F] transition-colors">
               Kurzy čalounění
             </a>
-            <a href="#restaurovani" className="hover:text-[#9E7425] transition-colors">
+            <a href="#restaurovani" className="hover:text-[#D9B45F] transition-colors">
               Zakázkové restaurování
             </a>
-            <a href="#veterani" className="hover:text-[#9E7425] transition-colors">
+            <a href="#veterani" className="hover:text-[#D9B45F] transition-colors">
               Autoveteráni
             </a>
-            <a href="#poukazy" className="hover:text-[#9E7425] transition-colors">
+            <a href="#poukazy" className="hover:text-[#D9B45F] transition-colors">
               Dárkové poukazy
             </a>
-            <a href="#historie" className="hover:text-[#9E7425] transition-colors">
+            <a href="#historie" className="hover:text-[#D9B45F] transition-colors">
               Rodinná historie
             </a>
-            <a href="#galerie" className="hover:text-[#9E7425] transition-colors">
+            <a href="#galerie" className="hover:text-[#D9B45F] transition-colors">
               Galerie
             </a>
-            <a href="#kontakt" className="hover:text-[#9E7425] transition-colors">
+            <a href="#kontakt" className="hover:text-[#D9B45F] transition-colors">
               Kontakt
             </a>
           </nav>
@@ -181,11 +181,11 @@ export function App() {
               href={CONTACT_INFO.reservantoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1F1A17] text-[#F5EFE6] hover:bg-[#332922] text-sm font-medium shadow-sm border border-[#C69C49]/50 transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#F2EBDD] text-[#F5EFE6] hover:bg-[#D5CBBB] text-sm font-medium shadow-sm border border-[#D4AF63]/50 transition-all"
             >
-              <Calendar className="w-4 h-4 text-[#DFB968]" />
+              <Calendar className="w-4 h-4 text-[#E6C27A]" />
               <span>Rezervace kurzů</span>
-              <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#E6C27A]" />
             </a>
           </div>
 
@@ -193,7 +193,7 @@ export function App() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Otevřít menu"
-            className="lg:hidden p-2.5 rounded-lg border border-[#D8CBB8] text-[#1F1A17] hover:bg-[#EFE7DA]"
+            className="lg:hidden p-2.5 rounded-lg border border-[#D8CBB8] text-[#F2EBDD] hover:bg-[#221E1A]"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -201,7 +201,7 @@ export function App() {
 
         {/* Mobile Dropdown Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#FAF6F0] border-b border-[#E2D7C5] px-4 pt-3 pb-6 space-y-2 shadow-xl">
+          <div className="lg:hidden bg-[#141210] border-b border-[#33291F] px-4 pt-3 pb-6 space-y-2 shadow-xl">
             {[
               { href: '#sluzby', label: 'Co nabízíme' },
               { href: '#kurzy', label: 'Kurzy čalounění a výroba taburetu' },
@@ -216,7 +216,7 @@ export function App() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="block py-2.5 px-3 rounded-lg text-base font-medium text-[#2A221D] hover:bg-[#EFE7DA]"
+                className="block py-2.5 px-3 rounded-lg text-base font-medium text-[#2A221D] hover:bg-[#221E1A]"
               >
                 {link.label}
               </a>
@@ -227,17 +227,17 @@ export function App() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#1F1A17] text-[#F5EFE6] font-medium border border-[#C69C49]/50"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#F2EBDD] text-[#F5EFE6] font-medium border border-[#D4AF63]/50"
               >
-                <Calendar className="w-4 h-4 text-[#DFB968]" />
+                <Calendar className="w-4 h-4 text-[#E6C27A]" />
                 <span>Rezervace termínů kurzů</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[#E6C27A]" />
               </a>
               <a
                 href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[#C69C49] text-[#1F1A17] font-medium"
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[#D4AF63] text-[#F2EBDD] font-medium"
               >
-                <Phone className="w-4 h-4 text-[#9E7425]" />
+                <Phone className="w-4 h-4 text-[#D9B45F]" />
                 <span>Zavolat: {CONTACT_INFO.phoneMainDisplay}</span>
               </a>
             </div>
@@ -246,28 +246,28 @@ export function App() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-linen pt-10 pb-20 lg:pt-16 lg:pb-28 border-b border-[#E2D7C5]">
+      <section className="relative overflow-hidden bg-linen pt-10 pb-20 lg:pt-16 lg:pb-28 border-b border-[#33291F]">
         {/* Decorative warm glow */}
-        <div className="pointer-events-none absolute -top-32 right-0 w-[34rem] h-[34rem] rounded-full bg-[#C69C49]/10 blur-3xl" />
+        <div className="pointer-events-none absolute -top-32 right-0 w-[34rem] h-[34rem] rounded-full bg-[#D4AF63]/10 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 left-10 w-[26rem] h-[26rem] rounded-full bg-[#8C4A27]/8 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
             {/* Hero Copy (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#EFE7DA] border border-[#C69C49]/40 text-[#694E1E] text-xs sm:text-sm font-medium">
-                <Award className="w-4 h-4 text-[#9E7425]" />
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#221E1A] border border-[#D4AF63]/40 text-[#694E1E] text-xs sm:text-sm font-medium">
+                <Award className="w-4 h-4 text-[#D9B45F]" />
                 <span>Téměř 30 let zkušeností • Tradice 3. generace čalouníků</span>
               </div>
 
-              <h1 className="font-serif text-4xl sm:text-6xl lg:text-[4.15rem] font-semibold text-[#1F1A17] leading-[1.08] tracking-tight">
+              <h1 className="font-serif text-4xl sm:text-6xl lg:text-[4.15rem] font-semibold text-[#F2EBDD] leading-[1.08] tracking-tight">
                 Dáváme věcem{' '}
-                <span className="italic font-normal text-[#8C5E1A]">nový život</span> a vašemu
+                <span className="italic font-normal text-[#C9A24E]">nový život</span> a vašemu
                 interiéru duši.
               </h1>
 
-              <p className="text-base sm:text-lg text-[#4B3F36] leading-relaxed max-w-2xl">
-                Jmenuji se <strong className="font-semibold text-[#1F1A17]">Ladislav Tobiášek</strong>.
+              <p className="text-base sm:text-lg text-[#C9BFB0] leading-relaxed max-w-2xl">
+                Jmenuji se <strong className="font-semibold text-[#F2EBDD]">Ladislav Tobiášek</strong>.
                 V čalounické a restaurátorské dílně <strong>Charivari Home</strong> v Nové Vsi u
                 Mělníka propojujeme tradiční rukodělné postupy mého pradědy Františka s moderními
                 požadavky na funkčnost a estetiku. Přijďte si k nám vlastnoručně zrenovovat kus
@@ -280,18 +280,18 @@ export function App() {
                   href={CONTACT_INFO.reservantoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-base shadow-lg shadow-[#1F1A17]/15 border border-[#C69C49]/60 transition-all group"
+                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[#F2EBDD] hover:bg-[#D5CBBB] text-[#141210] font-medium text-base shadow-lg shadow-[#F2EBDD]/15 border border-[#D4AF63]/60 transition-all group"
                 >
-                  <Calendar className="w-5 h-5 text-[#DFB968]" />
+                  <Calendar className="w-5 h-5 text-[#E6C27A]" />
                   <span>Rezervace termínů kurzů</span>
-                  <ExternalLink className="w-4 h-4 text-[#DFB968] group-hover:translate-x-0.5 transition-transform" />
+                  <ExternalLink className="w-4 h-4 text-[#E6C27A] group-hover:translate-x-0.5 transition-transform" />
                 </a>
 
                 <a
                   href="#restaurovani"
-                  className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full bg-[#FAF6F0] hover:bg-[#EFE7DA] text-[#1F1A17] font-medium text-base border border-[#C69C49]/50 transition-all"
+                  className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full bg-[#141210] hover:bg-[#221E1A] text-[#F2EBDD] font-medium text-base border border-[#D4AF63]/50 transition-all"
                 >
-                  <Hammer className="w-4 h-4 text-[#9E7425]" />
+                  <Hammer className="w-4 h-4 text-[#D9B45F]" />
                   <span>Zakázkové restaurování</span>
                 </a>
               </div>
@@ -299,26 +299,26 @@ export function App() {
               {/* Key Trust Metrics */}
               <div className="pt-6 grid grid-cols-3 gap-4 sm:gap-8 border-t border-[#DFD3C0] max-w-xl">
                 <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#1F1A17]">
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#F2EBDD]">
                     ~90 let
                   </div>
-                  <div className="text-xs sm:text-sm text-[#635447]">
+                  <div className="text-xs sm:text-sm text-[#A89C8B]">
                     rodinných kořenů v čalounění
                   </div>
                 </div>
                 <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#1F1A17]">
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#F2EBDD]">
                     1 den
                   </div>
-                  <div className="text-xs sm:text-sm text-[#635447]">
+                  <div className="text-xs sm:text-sm text-[#A89C8B]">
                     stačí k výrobě vlastního taburetu
                   </div>
                 </div>
                 <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#1F1A17]">
+                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[#F2EBDD]">
                     100%
                   </div>
-                  <div className="text-xs sm:text-sm text-[#635447]">
+                  <div className="text-xs sm:text-sm text-[#A89C8B]">
                     poctivá ruční práce a materiály
                   </div>
                 </div>
@@ -329,15 +329,15 @@ export function App() {
             <div className="lg:col-span-5 relative">
               <div className="grid grid-cols-12 gap-4 items-center">
                 {/* Main Workshop / Course Image */}
-                <div className="col-span-7 relative rounded-2xl overflow-hidden shadow-xl border-4 border-[#FAF6F0] bg-[#231C18] aspect-[4/5]">
+                <div className="col-span-7 relative rounded-2xl overflow-hidden shadow-xl border-4 border-[#141210] bg-[#1A1612] aspect-[4/5]">
                   <img
                     src="/images/service-kurzy.jpg"
                     alt="Kurzy čalounění Charivari Home"
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#181310]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3 text-[#FAF6F0]">
-                    <span className="text-[11px] uppercase tracking-wider text-[#DFB968] font-semibold">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0908]/80 via-transparent to-transparent" />
+                  <div className="absolute bottom-3 left-3 right-3 text-[#141210]">
+                    <span className="text-[11px] uppercase tracking-wider text-[#E6C27A] font-semibold">
                       Zážitkové kurzy
                     </span>
                     <p className="font-serif text-lg leading-snug">
@@ -348,22 +348,22 @@ export function App() {
 
                 {/* Stacked Secondary Images */}
                 <div className="col-span-5 space-y-4">
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[#FAF6F0] aspect-square">
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[#141210] aspect-square">
                     <img
                       src="/images/rest-kreslo.jpg"
                       alt="Restaurované křeslo"
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[#FAF6F0] aspect-[4/5]">
+                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[#141210] aspect-[4/5]">
                     <img
                       src="/images/hist-1-frantisek.jpg"
                       alt="Praděda František a děda Ladislav"
                       className="w-full h-full object-cover archival-photo"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#181310]/85 via-transparent to-transparent" />
-                    <div className="absolute bottom-2.5 left-2.5 right-2.5 text-[#FAF6F0]">
-                      <span className="text-[10px] uppercase tracking-wider text-[#DFB968]">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0908]/85 via-transparent to-transparent" />
+                    <div className="absolute bottom-2.5 left-2.5 right-2.5 text-[#141210]">
+                      <span className="text-[10px] uppercase tracking-wider text-[#E6C27A]">
                         Holešovice • 30. léta
                       </span>
                       <p className="font-serif text-xs leading-tight">
@@ -379,16 +379,16 @@ export function App() {
       </section>
 
       {/* 4 PILLARS OVERVIEW (Co v dílně nabízíme) */}
-      <section id="sluzby" className="py-20 bg-[#FAF6F0]">
+      <section id="sluzby" className="py-20 bg-[#141210]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9E7425]">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D9B45F]">
               Řemeslo pod jednou střechou
             </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#1F1A17] mt-2">
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#F2EBDD] mt-2">
               Čtyři pilíře dílny Charivari Home
             </h2>
-            <p className="text-[#5A4C41] mt-3 text-base sm:text-lg">
+            <p className="text-[#B5AA9A] mt-3 text-base sm:text-lg">
                *Charivari* je slovo, které v sobě nese pestrost, rozmanitost a radost. Máme úctu k
               barokním křeslům, ikonickému designu 20. století i historickým vozům.
             </p>
@@ -438,31 +438,31 @@ export function App() {
                 <a
                   key={card.title}
                   href={card.href}
-                  className="group bg-[#F4EDE2] rounded-2xl overflow-hidden border border-[#E2D7C5] hover:border-[#C69C49] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+                  className="group bg-[#1B1815] rounded-2xl overflow-hidden border border-[#33291F] hover:border-[#D4AF63] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
-                  <div className="relative h-56 overflow-hidden bg-[#231C18]">
+                  <div className="relative h-56 overflow-hidden bg-[#1A1612]">
                     <img
                       src={card.img}
                       alt={card.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-[#181310]/85 backdrop-blur-sm border border-[#C69C49]/50 flex items-center justify-center text-[#DFB968]">
+                    <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-[#0A0908]/85 backdrop-blur-sm border border-[#D4AF63]/50 flex items-center justify-center text-[#E6C27A]">
                       <IconComponent className="w-5 h-5" />
                     </div>
                   </div>
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-[#9E7425]">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-[#D9B45F]">
                         {card.subtitle}
                       </span>
-                      <h3 className="font-serif text-2xl font-semibold text-[#1F1A17] mt-1 group-hover:text-[#8C5E1A] transition-colors">
+                      <h3 className="font-serif text-2xl font-semibold text-[#F2EBDD] mt-1 group-hover:text-[#C9A24E] transition-colors">
                         {card.title}
                       </h3>
-                      <p className="text-sm text-[#5A4C41] mt-2.5 leading-relaxed">{card.desc}</p>
+                      <p className="text-sm text-[#B5AA9A] mt-2.5 leading-relaxed">{card.desc}</p>
                     </div>
-                    <div className="mt-5 pt-4 border-t border-[#E2D7C5] flex items-center justify-between text-sm font-semibold text-[#1F1A17]">
+                    <div className="mt-5 pt-4 border-t border-[#33291F] flex items-center justify-between text-sm font-semibold text-[#F2EBDD]">
                       <span>{card.cta}</span>
-                      <ArrowRight className="w-4 h-4 text-[#9E7425] group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 text-[#D9B45F] group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
                 </a>
@@ -473,17 +473,17 @@ export function App() {
       </section>
 
       {/* COURSES SECTION (Kurzy čalounění a výroba taburetu) */}
-      <section id="kurzy" className="py-24 bg-[#F3ECE0] border-y border-[#E2D7C5]">
+      <section id="kurzy" className="py-24 bg-[#1B1815] border-y border-[#33291F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
             <div className="max-w-2xl">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9E7425]">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D9B45F]">
                 Zážitkové řemeslné kurzy v Nové Vsi u Mělníka
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#1F1A17] mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#F2EBDD] mt-2">
                 Naučte se řemeslo, které dává smysl
               </h2>
-              <p className="text-[#4B3F36] mt-3 text-base sm:text-lg">
+              <p className="text-[#C9BFB0] mt-3 text-base sm:text-lg">
                 „V Charivari nevyrábíme jen věci. Měníme způsob, jakým se díváte na svůj interiér. Z
                 věcí, které ostatní vyhazují, u nás společně tvoříme poklady.“
               </p>
@@ -493,11 +493,11 @@ export function App() {
                 href={CONTACT_INFO.reservantoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm shadow-md border border-[#C69C49]/50"
+                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#F2EBDD] hover:bg-[#D5CBBB] text-[#141210] font-medium text-sm shadow-md border border-[#D4AF63]/50"
               >
-                <Calendar className="w-4 h-4 text-[#DFB968]" />
+                <Calendar className="w-4 h-4 text-[#E6C27A]" />
                 <span>Zobrazit volné termíny v kalendáři</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                <ExternalLink className="w-3.5 h-3.5 text-[#E6C27A]" />
               </a>
             </div>
           </div>
@@ -507,25 +507,25 @@ export function App() {
             {COURSES.map((course) => (
               <div
                 key={course.id}
-                className="bg-[#FAF6F0] rounded-3xl overflow-hidden border border-[#DFD2BE] shadow-md flex flex-col justify-between"
+                className="bg-[#141210] rounded-3xl overflow-hidden border border-[#3A3027] shadow-md flex flex-col justify-between"
               >
                 <div>
                   {/* Course Header Image */}
-                  <div className="relative h-72 overflow-hidden bg-[#231C18]">
+                  <div className="relative h-72 overflow-hidden bg-[#1A1612]">
                     <img
                       src={course.image}
                       alt={course.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#181310]/85 via-[#181310]/25 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0908]/85 via-[#0A0908]/25 to-transparent" />
                     <div className="absolute top-4 left-4">
-                      <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#181310]/90 text-[#DFB968] border border-[#C69C49]/50">
+                      <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#0A0908]/90 text-[#E6C27A] border border-[#D4AF63]/50">
                         {course.badge}
                       </span>
                     </div>
-                    <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between gap-4 text-[#FAF6F0]">
+                    <div className="absolute bottom-4 left-6 right-6 flex items-end justify-between gap-4 text-[#141210]">
                       <div>
-                        <div className="flex items-center gap-1.5 text-xs text-[#DFB968] mb-1">
+                        <div className="flex items-center gap-1.5 text-xs text-[#E6C27A] mb-1">
                           <Clock className="w-3.5 h-3.5" />
                           <span>{course.duration}</span>
                         </div>
@@ -533,11 +533,11 @@ export function App() {
                           {course.title}
                         </h3>
                       </div>
-                      <div className="text-right shrink-0 bg-[#181310]/90 px-4 py-2 rounded-2xl border border-[#C69C49]/40">
-                        <span className="block text-[10px] uppercase tracking-wider text-[#C69C49]">
+                      <div className="text-right shrink-0 bg-[#0A0908]/90 px-4 py-2 rounded-2xl border border-[#D4AF63]/40">
+                        <span className="block text-[10px] uppercase tracking-wider text-[#D4AF63]">
                           Cena kurzu
                         </span>
-                        <span className="font-serif text-2xl font-bold text-[#FAF6F0]">
+                        <span className="font-serif text-2xl font-bold text-[#141210]">
                           {course.price}
                         </span>
                       </div>
@@ -546,29 +546,29 @@ export function App() {
 
                   {/* Course Body */}
                   <div className="p-6 sm:p-8 space-y-6">
-                    <p className="text-[#4B3F36] text-base leading-relaxed">{course.description}</p>
+                    <p className="text-[#C9BFB0] text-base leading-relaxed">{course.description}</p>
 
                     <div className="space-y-2.5">
-                      <h4 className="font-serif text-xl font-semibold text-[#1F1A17]">
+                      <h4 className="font-serif text-xl font-semibold text-[#F2EBDD]">
                         Co vás na kurzu čeká:
                       </h4>
                       <ul className="space-y-2">
                         {course.highlights.map((item, idx) => (
-                          <li key={idx} className="flex items-start gap-2.5 text-sm text-[#3D332C]">
-                            <CheckCircle2 className="w-4 h-4 text-[#9E7425] shrink-0 mt-0.5" />
+                          <li key={idx} className="flex items-start gap-2.5 text-sm text-[#D9D0C2]">
+                            <CheckCircle2 className="w-4 h-4 text-[#D9B45F] shrink-0 mt-0.5" />
                             <span>{item}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
 
-                    <div className="p-4 rounded-2xl bg-[#F3ECE0] border border-[#E2D7C5] space-y-2">
-                      <div className="text-xs font-bold uppercase tracking-wider text-[#8C5E1A]">
+                    <div className="p-4 rounded-2xl bg-[#1B1815] border border-[#33291F] space-y-2">
+                      <div className="text-xs font-bold uppercase tracking-wider text-[#C9A24E]">
                         Co si vzít s sebou &amp; jak je to s látkou?
                       </div>
-                      <p className="text-sm text-[#3D332C] font-medium">{course.whatToBring}</p>
+                      <p className="text-sm text-[#D9D0C2] font-medium">{course.whatToBring}</p>
                       {course.fabricInfo.map((info, i) => (
-                        <p key={i} className="text-xs sm:text-sm text-[#5A4C41]">
+                        <p key={i} className="text-xs sm:text-sm text-[#B5AA9A]">
                           • {info}
                         </p>
                       ))}
@@ -582,17 +582,17 @@ export function App() {
                     href={CONTACT_INFO.reservantoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm border border-[#C69C49]/50 transition-all"
+                    className="flex-1 inline-flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-[#F2EBDD] hover:bg-[#D5CBBB] text-[#141210] font-medium text-sm border border-[#D4AF63]/50 transition-all"
                   >
-                    <Calendar className="w-4 h-4 text-[#DFB968]" />
+                    <Calendar className="w-4 h-4 text-[#E6C27A]" />
                     <span>Rezervovat termín ({course.price})</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#E6C27A]" />
                   </a>
                   <a
                     href="#poukazy"
-                    className="inline-flex items-center justify-center gap-1.5 py-3.5 px-4 rounded-xl border border-[#C69C49]/60 text-[#1F1A17] hover:bg-[#EFE7DA] text-sm font-medium transition-all"
+                    className="inline-flex items-center justify-center gap-1.5 py-3.5 px-4 rounded-xl border border-[#D4AF63]/60 text-[#F2EBDD] hover:bg-[#221E1A] text-sm font-medium transition-all"
                   >
-                    <Gift className="w-4 h-4 text-[#9E7425]" />
+                    <Gift className="w-4 h-4 text-[#D9B45F]" />
                     <span>Koupit jako poukaz</span>
                   </a>
                 </div>
@@ -601,16 +601,16 @@ export function App() {
           </div>
 
           {/* Workshop Comfort Banner */}
-          <div className="mt-10 bg-[#FAF6F0] rounded-2xl p-6 sm:p-8 border border-[#DFD2BE] grid sm:grid-cols-3 gap-6">
+          <div className="mt-10 bg-[#141210] rounded-2xl p-6 sm:p-8 border border-[#3A3027] grid sm:grid-cols-3 gap-6">
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#EFE7DA] flex items-center justify-center text-[#9E7425] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#221E1A] flex items-center justify-center text-[#D9B45F] shrink-0">
                 <Scissors className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-serif text-lg font-semibold text-[#1F1A17]">
+                <h4 className="font-serif text-lg font-semibold text-[#F2EBDD]">
                   Ochranné pomůcky a nářadí k zapůjčení
                 </h4>
-                <p className="text-xs sm:text-sm text-[#5A4C41] mt-0.5">
+                <p className="text-xs sm:text-sm text-[#B5AA9A] mt-0.5">
                   U nás se práší a občas i barví – v dílně jsou pro vás k zapůjčení zástěry,
                   pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka i veškeré
                   profesionální nářadí.
@@ -618,28 +618,28 @@ export function App() {
               </div>
             </div>
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#EFE7DA] flex items-center justify-center text-[#9E7425] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#221E1A] flex items-center justify-center text-[#D9B45F] shrink-0">
                 <Coffee className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-serif text-lg font-semibold text-[#1F1A17]">
+                <h4 className="font-serif text-lg font-semibold text-[#F2EBDD]">
                   Káva, čaj a občerstvení zdarma
                 </h4>
-                <p className="text-xs sm:text-sm text-[#5A4C41] mt-0.5">
+                <p className="text-xs sm:text-sm text-[#B5AA9A] mt-0.5">
                   Po celý den je pro vás v dílně zdarma k dispozici káva, čaj, drobné občerstvení,
                   dobrá nálada a špetka trpělivosti.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[#EFE7DA] flex items-center justify-center text-[#9E7425] shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#221E1A] flex items-center justify-center text-[#D9B45F] shrink-0">
                 <Sparkles className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-serif text-lg font-semibold text-[#1F1A17]">
+                <h4 className="font-serif text-lg font-semibold text-[#F2EBDD]">
                   Vzorníky látek přímo na místě
                 </h4>
-                <p className="text-xs sm:text-sm text-[#5A4C41] mt-0.5">
+                <p className="text-xs sm:text-sm text-[#B5AA9A] mt-0.5">
                   Nechce se vám nic shánět? V dílně máme mnoho vzorníků kvalitních potahových látek,
                   které si můžete osahat a přiložit k nábytku.
                 </p>
@@ -650,18 +650,18 @@ export function App() {
       </section>
 
       {/* ZAKÁZKOVÉ RESTAUROVÁNÍ SECTION */}
-      <section id="restaurovani" className="py-24 bg-[#FAF6F0]">
+      <section id="restaurovani" className="py-24 bg-[#141210]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Left Content (6 cols) */}
             <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9E7425]">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D9B45F]">
                 Zakázkové restaurování a čalounění
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#1F1A17] leading-tight">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#F2EBDD] leading-tight">
                 Zachováváme historickou patinu a duši nábytku
               </h2>
-              <p className="text-[#4B3F36] text-base sm:text-lg leading-relaxed">
+              <p className="text-[#C9BFB0] text-base sm:text-lg leading-relaxed">
                 Mým cílem není vytvořit nový kus nábytku, ale restaurovat ho tak, aby byla zachována
                 jeho historická patina a duše, a přitom byl plně využitelný pro moderní interiér.
                 Používám tradiční materiály jako jsou <strong>africká tráva</strong>,{' '}
@@ -690,12 +690,12 @@ export function App() {
                 ].map((item) => (
                   <div
                     key={item.title}
-                    className="p-5 rounded-2xl bg-[#F4EDE2] border border-[#E2D7C5]"
+                    className="p-5 rounded-2xl bg-[#1B1815] border border-[#33291F]"
                   >
-                    <h3 className="font-serif text-xl font-semibold text-[#1F1A17]">
+                    <h3 className="font-serif text-xl font-semibold text-[#F2EBDD]">
                       {item.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#5A4C41] mt-1.5 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[#B5AA9A] mt-1.5 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -703,13 +703,13 @@ export function App() {
               </div>
 
               {/* Photo Estimate Callout */}
-              <div className="p-6 rounded-2xl bg-[#1F1A17] text-[#FAF6F0] border border-[#C69C49]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="p-6 rounded-2xl bg-[#F2EBDD] text-[#141210] border border-[#D4AF63]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                 <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-[#DFB968] text-xs font-semibold uppercase tracking-wider">
+                  <div className="flex items-center gap-2 text-[#E6C27A] text-xs font-semibold uppercase tracking-wider">
                     <Camera className="w-4 h-4" />
                     <span>Konzultace a nacenění podle fotek</span>
                   </div>
-                  <p className="text-sm text-[#E2D7C5]">
+                  <p className="text-sm text-[#33291F]">
                     Pošlete nám fotografie vašeho nábytku a společně si řekneme, jaký by byl postup,
                     termín i cena.
                   </p>
@@ -718,7 +718,7 @@ export function App() {
                   href={`mailto:${CONTACT_INFO.emailMain}?subject=${encodeURIComponent(
                     'Poptávka zakázkového restaurování / čalounění'
                   )}`}
-                  className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#C69C49] hover:bg-[#d4ab57] text-[#181310] font-semibold text-sm transition-colors"
+                  className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#D4AF63] hover:bg-[#E6C27A] text-[#0A0908] font-semibold text-sm transition-colors"
                 >
                   <Mail className="w-4 h-4" />
                   <span>Poslat fotku e-mailem</span>
@@ -729,14 +729,14 @@ export function App() {
             {/* Right Image Mosaic (6 cols) */}
             <div className="lg:col-span-6 grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#E2D7C5] aspect-[4/5]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[#33291F] aspect-[4/5]">
                   <img
                     src="/images/rest-1.jpg"
                     alt="Tradiční vyvazování pružin"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#E2D7C5] aspect-[4/3]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[#33291F] aspect-[4/3]">
                   <img
                     src="/images/rest-modre-zidle.jpg"
                     alt="Zrestaurované modré židle"
@@ -745,14 +745,14 @@ export function App() {
                 </div>
               </div>
               <div className="space-y-4 pt-6">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#E2D7C5] aspect-[4/3]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[#33291F] aspect-[4/3]">
                   <img
                     src="/images/rest-2.jpg"
                     alt="Zakázkové čalounění křesla"
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                   />
                 </div>
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[#E2D7C5] aspect-[4/5]">
+                <div className="rounded-2xl overflow-hidden shadow-md border border-[#33291F] aspect-[4/5]">
                   <img
                     src="/images/rest-lavice.jpg"
                     alt="Čalouněná lavice na míru"
@@ -766,23 +766,23 @@ export function App() {
       </section>
 
       {/* AUTOVETERÁNI A MOTOCYKLY SECTION (Dark Heritage Contrast) */}
-      <section id="veterani" className="py-24 bg-[#181310] text-[#F5EFE6] relative overflow-hidden">
-        <div className="pointer-events-none absolute top-0 left-1/3 w-96 h-96 rounded-full bg-[#C69C49]/10 blur-3xl" />
+      <section id="veterani" className="py-24 bg-[#0A0908] text-[#F5EFE6] relative overflow-hidden">
+        <div className="pointer-events-none absolute top-0 left-1/3 w-96 h-96 rounded-full bg-[#D4AF63]/10 blur-3xl" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Left Copy (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#261E19] border border-[#C69C49]/40 text-[#DFB968] text-xs font-medium">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#261E19] border border-[#D4AF63]/40 text-[#E6C27A] text-xs font-medium">
                 <Car className="w-3.5 h-3.5" />
                 <span>Veteráni a motocykly</span>
               </div>
 
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#FAF6F0] leading-tight">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#141210] leading-tight">
                 Sedla a interiéry s úctou k historii
               </h2>
 
-              <blockquote className="font-serif italic text-xl sm:text-2xl text-[#DFB968] border-l-2 border-[#C69C49] pl-4">
+              <blockquote className="font-serif italic text-xl sm:text-2xl text-[#E6C27A] border-l-2 border-[#D4AF63] pl-4">
                 „Vracíme komfort tam, kde se píše historie.“
               </blockquote>
 
@@ -794,8 +794,8 @@ export function App() {
               </p>
 
               <div className="space-y-4 pt-2">
-                <div className="p-4 rounded-2xl bg-[#231C18] border border-[#C69C49]/25">
-                  <h3 className="font-serif text-xl font-semibold text-[#DFB968]">
+                <div className="p-4 rounded-2xl bg-[#1A1612] border border-[#D4AF63]/25">
+                  <h3 className="font-serif text-xl font-semibold text-[#E6C27A]">
                     Interiéry autoveteránů
                   </h3>
                   <p className="text-xs sm:text-sm text-[#D5C9BA] mt-1">
@@ -804,8 +804,8 @@ export function App() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#231C18] border border-[#C69C49]/25">
-                  <h3 className="font-serif text-xl font-semibold text-[#DFB968]">
+                <div className="p-4 rounded-2xl bg-[#1A1612] border border-[#D4AF63]/25">
+                  <h3 className="font-serif text-xl font-semibold text-[#E6C27A]">
                     Renovace sedel motocyklů
                   </h3>
                   <p className="text-xs sm:text-sm text-[#D5C9BA] mt-1">
@@ -818,7 +818,7 @@ export function App() {
               <div className="pt-2 flex flex-wrap gap-3">
                 <a
                   href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#C69C49] hover:bg-[#d4ab57] text-[#181310] font-semibold text-sm transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#D4AF63] hover:bg-[#E6C27A] text-[#0A0908] font-semibold text-sm transition-colors"
                 >
                   <Phone className="w-4 h-4" />
                   <span>Konzultovat renovaci: {CONTACT_INFO.phoneMainDisplay}</span>
@@ -828,10 +828,10 @@ export function App() {
                     setActiveGalleryCategory('veterani');
                     document.getElementById('galerie')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full border border-[#C69C49]/50 text-[#FAF6F0] hover:bg-[#261E19] text-sm font-medium transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full border border-[#D4AF63]/50 text-[#141210] hover:bg-[#261E19] text-sm font-medium transition-colors cursor-pointer"
                 >
                   <span>Všechny fotky veteránů</span>
-                  <ArrowRight className="w-4 h-4 text-[#DFB968]" />
+                  <ArrowRight className="w-4 h-4 text-[#E6C27A]" />
                 </button>
               </div>
             </div>
@@ -857,7 +857,7 @@ export function App() {
                       description: 'Ukázka čalounické práce z dílny Charivari Home.',
                     })
                   }
-                  className={`group relative rounded-2xl overflow-hidden border border-[#C69C49]/30 cursor-pointer ${
+                  className={`group relative rounded-2xl overflow-hidden border border-[#D4AF63]/30 cursor-pointer ${
                     index === 0 ? 'col-span-2 sm:col-span-2 aspect-[16/10]' : 'aspect-square'
                   }`}
                 >
@@ -866,8 +866,8 @@ export function App() {
                     alt="Čalounění autoveteránů"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-[#181310]/0 group-hover:bg-[#181310]/30 transition-colors flex items-center justify-center">
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-full bg-[#181310]/90 text-[#DFB968] text-xs font-medium">
+                  <div className="absolute inset-0 bg-[#0A0908]/0 group-hover:bg-[#0A0908]/30 transition-colors flex items-center justify-center">
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-full bg-[#0A0908]/90 text-[#E6C27A] text-xs font-medium">
                       Zvětšit fotografii
                     </span>
                   </div>
@@ -879,12 +879,12 @@ export function App() {
       </section>
 
       {/* GIFT VOUCHERS SECTION (Dárkové poukazy s konfigurátorem) */}
-      <section id="poukazy" className="py-24 bg-[#F4EDE2] border-b border-[#E2D7C5]">
+      <section id="poukazy" className="py-24 bg-[#1B1815] border-b border-[#33291F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-12 gap-12 items-center">
             {/* Voucher Visual Preview (6 cols) */}
             <div className="lg:col-span-6 space-y-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-[#FAF6F0] bg-[#181310]">
+              <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-[#141210] bg-[#0A0908]">
                 <img
                   src="/images/voucher.jpg"
                   alt="Dárkový voucher Charivari Home"
@@ -893,27 +893,27 @@ export function App() {
               </div>
 
               {/* Live Dedication Preview Card */}
-              <div className="p-6 rounded-2xl bg-[#FAF6F0] border border-[#C69C49]/50 shadow-sm">
-                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-[#9E7425] font-semibold mb-2">
+              <div className="p-6 rounded-2xl bg-[#141210] border border-[#D4AF63]/50 shadow-sm">
+                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-[#D9B45F] font-semibold mb-2">
                   <span>Náhled vašeho zadání na voucher</span>
                   <span>Platnost: 1 rok</span>
                 </div>
-                <div className="font-serif text-xl font-semibold text-[#1F1A17]">
+                <div className="font-serif text-xl font-semibold text-[#F2EBDD]">
                   {selectedVoucherCourse === '3300'
                     ? 'Kurz Renovace a čalounění nábytku (3 300 Kč)'
                     : 'Kurz Výroba čalouněného taburetu (3 900 Kč)'}
                 </div>
                 {voucherRecipient && (
-                  <p className="text-sm text-[#3D332C] mt-1">
+                  <p className="text-sm text-[#D9D0C2] mt-1">
                     <strong>Pro koho:</strong> {voucherRecipient}
                   </p>
                 )}
                 {voucherDedication ? (
-                  <p className="font-serif italic text-base text-[#5A4C41] mt-2 border-l-2 border-[#C69C49] pl-3">
+                  <p className="font-serif italic text-base text-[#B5AA9A] mt-2 border-l-2 border-[#D4AF63] pl-3">
                     „{voucherDedication}“
                   </p>
                 ) : (
-                  <p className="text-xs text-[#7A6A58] mt-1.5">
+                  <p className="text-xs text-[#9A8E7C] mt-1.5">
                     Na voucher vám rádi napíšeme osobní věnování a můžeme přidat i vámi zaslanou
                     fotografii.
                   </p>
@@ -923,16 +923,16 @@ export function App() {
 
             {/* Voucher Interactive Order Box (6 cols) */}
             <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FAF6F0] border border-[#C69C49]/40 text-[#8C5E1A] text-xs font-semibold">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141210] border border-[#D4AF63]/40 text-[#C9A24E] text-xs font-semibold">
                 <Gift className="w-3.5 h-3.5" />
                 <span>Dárkové poukazy s platností 1 rok</span>
               </div>
 
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#1F1A17] leading-tight">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#F2EBDD] leading-tight">
                 Darujte zážitek, který zůstane doma napořád
               </h2>
 
-              <p className="text-[#4B3F36] text-base leading-relaxed">
+              <p className="text-[#C9BFB0] text-base leading-relaxed">
                 Nabízíme nákup dárkového voucheru pro vás, vaše blízké či kolegy. Na vouchery píšeme
                 osobní věnování a můžeme na ně umístit například i zaslanou fotografii křesla či
                 obdarovaného.
@@ -940,7 +940,7 @@ export function App() {
 
               {/* Step 1: Select Course */}
               <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#5A4C41]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#B5AA9A]">
                   1. Vyberte typ kurzu na poukaz:
                 </label>
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -949,12 +949,12 @@ export function App() {
                     onClick={() => setSelectedVoucherCourse('3300')}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedVoucherCourse === '3300'
-                        ? 'bg-[#1F1A17] text-[#FAF6F0] border-[#C69C49] shadow-md'
-                        : 'bg-[#FAF6F0] text-[#1F1A17] border-[#DFD2BE] hover:border-[#C69C49]'
+                        ? 'bg-[#F2EBDD] text-[#141210] border-[#D4AF63] shadow-md'
+                        : 'bg-[#141210] text-[#F2EBDD] border-[#3A3027] hover:border-[#D4AF63]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wider text-[#C69C49] font-semibold">
+                      <span className="text-xs uppercase tracking-wider text-[#D4AF63] font-semibold">
                         Vlastní kus nábytku
                       </span>
                       <span className="font-serif text-xl font-bold">3 300 Kč</span>
@@ -969,12 +969,12 @@ export function App() {
                     onClick={() => setSelectedVoucherCourse('3900')}
                     className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
                       selectedVoucherCourse === '3900'
-                        ? 'bg-[#1F1A17] text-[#FAF6F0] border-[#C69C49] shadow-md'
-                        : 'bg-[#FAF6F0] text-[#1F1A17] border-[#DFD2BE] hover:border-[#C69C49]'
+                        ? 'bg-[#F2EBDD] text-[#141210] border-[#D4AF63] shadow-md'
+                        : 'bg-[#141210] text-[#F2EBDD] border-[#3A3027] hover:border-[#D4AF63]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wider text-[#C69C49] font-semibold">
+                      <span className="text-xs uppercase tracking-wider text-[#D4AF63] font-semibold">
                         Materiál v ceně
                       </span>
                       <span className="font-serif text-xl font-bold">3 900 Kč</span>
@@ -988,7 +988,7 @@ export function App() {
 
               {/* Step 2: Optional Personalization */}
               <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[#5A4C41]">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[#B5AA9A]">
                   2. Osobní věnování (nepovinné – připraví text do objednávky):
                 </label>
                 <input
@@ -997,7 +997,7 @@ export function App() {
                   value={voucherRecipient}
                   onChange={(e) => setVoucherRecipient(sanitizeInput(e.target.value, 100))}
                   placeholder="Jméno obdarovaného (např. Pro maminku k narozeninám)"
-                  className="w-full px-4 py-3 rounded-xl bg-[#FAF6F0] border border-[#DFD2BE] focus:outline-none focus:border-[#9E7425] text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-[#141210] border border-[#3A3027] focus:outline-none focus:border-[#D9B45F] text-sm"
                 />
                 <textarea
                   rows={2}
@@ -1005,7 +1005,7 @@ export function App() {
                   value={voucherDedication}
                   onChange={(e) => setVoucherDedication(sanitizeInput(e.target.value, 300))}
                   placeholder="Váš text věnování na voucher..."
-                  className="w-full px-4 py-3 rounded-xl bg-[#FAF6F0] border border-[#DFD2BE] focus:outline-none focus:border-[#9E7425] text-sm"
+                  className="w-full px-4 py-3 rounded-xl bg-[#141210] border border-[#3A3027] focus:outline-none focus:border-[#D9B45F] text-sm"
                 />
               </div>
 
@@ -1015,18 +1015,18 @@ export function App() {
                   href={CONTACT_INFO.reservantoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#1F1A17] hover:bg-[#332922] text-[#FAF6F0] font-medium text-sm border border-[#C69C49]/50 shadow-md transition-all"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[#F2EBDD] hover:bg-[#D5CBBB] text-[#141210] font-medium text-sm border border-[#D4AF63]/50 shadow-md transition-all"
                 >
-                  <Calendar className="w-4 h-4 text-[#DFB968]" />
+                  <Calendar className="w-4 h-4 text-[#E6C27A]" />
                   <span>Přejít do rezervačního systému</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[#E6C27A]" />
                 </a>
                 <button
                   type="button"
                   onClick={handleVoucherMailto}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[#FAF6F0] hover:bg-[#EFE7DA] text-[#1F1A17] font-medium text-sm border border-[#C69C49]/60 transition-all cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[#141210] hover:bg-[#221E1A] text-[#F2EBDD] font-medium text-sm border border-[#D4AF63]/60 transition-all cursor-pointer"
                 >
-                  <Mail className="w-4 h-4 text-[#9E7425]" />
+                  <Mail className="w-4 h-4 text-[#D9B45F]" />
                   <span>Objednat e-mailem</span>
                 </button>
               </div>
@@ -1036,17 +1036,17 @@ export function App() {
       </section>
 
       {/* FAMILY HISTORY & ABOUT ME SECTION (Rodinná historie & O mně) */}
-      <section id="historie" className="py-24 bg-[#FAF6F0]">
+      <section id="historie" className="py-24 bg-[#141210]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#EFE7DA] border border-[#C69C49]/40 text-[#8C5E1A] text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#221E1A] border border-[#D4AF63]/40 text-[#C9A24E] text-xs font-semibold">
               <History className="w-3.5 h-3.5" />
               <span>Rodinná tradice • Praha 7 Holešovice &rarr; Nová Ves u Mělníka</span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#1F1A17] mt-3">
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#F2EBDD] mt-3">
               Příběh psaný třemi generacemi
             </h2>
-            <p className="text-[#4B3F36] mt-4 text-base sm:text-lg leading-relaxed">
+            <p className="text-[#C9BFB0] mt-4 text-base sm:text-lg leading-relaxed">
               Jmenuji se <strong>Ladislav Tobiášek</strong> a restaurování a čalounění se věnuji
               téměř 30 let. Tento obor vnímám nejen jako práci, ale především jako poslání uchovat
               hodnoty vytvořené generacemi před námi. Moje cesta k řemeslu začala u mého pradědy{' '}
@@ -1070,7 +1070,7 @@ export function App() {
                     description: photo.caption,
                   })
                 }
-                className="group bg-[#F4EDE2] rounded-3xl overflow-hidden border border-[#DFD2BE] hover:border-[#C69C49] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
+                className="group bg-[#1B1815] rounded-3xl overflow-hidden border border-[#3A3027] hover:border-[#D4AF63] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
               >
                 <div className="relative h-80 overflow-hidden bg-[#1D1714] p-3">
                   <img
@@ -1078,20 +1078,20 @@ export function App() {
                     alt={photo.title}
                     className="w-full h-full object-contain rounded-2xl archival-photo"
                   />
-                  <div className="absolute top-6 left-6 px-3 py-1 rounded-full bg-[#181310]/85 text-[#DFB968] text-xs font-medium border border-[#C69C49]/40">
+                  <div className="absolute top-6 left-6 px-3 py-1 rounded-full bg-[#0A0908]/85 text-[#E6C27A] text-xs font-medium border border-[#D4AF63]/40">
                     {index + 1}. {photo.era}
                   </div>
                 </div>
                 <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
                   <div>
-                    <h3 className="font-serif text-2xl font-semibold text-[#1F1A17]">
+                    <h3 className="font-serif text-2xl font-semibold text-[#F2EBDD]">
                       {photo.title}
                     </h3>
-                    <p className="text-[#4B3F36] text-sm sm:text-base mt-2 leading-relaxed">
+                    <p className="text-[#C9BFB0] text-sm sm:text-base mt-2 leading-relaxed">
                       {photo.caption}
                     </p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-[#E2D7C5] text-xs font-semibold uppercase tracking-wider text-[#9E7425] flex items-center justify-between">
+                  <div className="mt-4 pt-3 border-t border-[#33291F] text-xs font-semibold uppercase tracking-wider text-[#D9B45F] flex items-center justify-between">
                     <span>Rodinný archiv Tobiáškových</span>
                     <span>Kliknutím zvětšíte &rarr;</span>
                   </div>
@@ -1103,14 +1103,14 @@ export function App() {
       </section>
 
       {/* INTERACTIVE GALLERY SECTION */}
-      <section id="galerie" className="py-24 bg-[#F3ECE0] border-t border-[#E2D7C5]">
+      <section id="galerie" className="py-24 bg-[#1B1815] border-t border-[#33291F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#9E7425]">
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#D9B45F]">
                 Portfolio &amp; Ukázky prací
               </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#1F1A17] mt-2">
+              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#F2EBDD] mt-2">
                 Galerie z naší dílny
               </h2>
             </div>
@@ -1132,8 +1132,8 @@ export function App() {
                   }}
                   className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer ${
                     activeGalleryCategory === tab.id
-                      ? 'bg-[#1F1A17] text-[#FAF6F0] shadow-sm border border-[#C69C49]'
-                      : 'bg-[#FAF6F0] text-[#4B3F36] hover:bg-[#EFE7DA] border border-[#DFD2BE]'
+                      ? 'bg-[#F2EBDD] text-[#141210] shadow-sm border border-[#D4AF63]'
+                      : 'bg-[#141210] text-[#C9BFB0] hover:bg-[#221E1A] border border-[#3A3027]'
                   }`}
                 >
                   {tab.label}
@@ -1148,7 +1148,7 @@ export function App() {
               <div
                 key={item.id}
                 onClick={() => setLightboxItem(item)}
-                className="group relative rounded-2xl overflow-hidden bg-[#1D1714] border border-[#DFD2BE] aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all"
+                className="group relative rounded-2xl overflow-hidden bg-[#1D1714] border border-[#3A3027] aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all"
               >
                 <img
                   src={item.src}
@@ -1156,8 +1156,8 @@ export function App() {
                   loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#181310]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <span className="text-[10px] uppercase tracking-wider text-[#DFB968] font-semibold">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0908]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                  <span className="text-[10px] uppercase tracking-wider text-[#E6C27A] font-semibold">
                     {item.category === 'kurzy'
                       ? 'Kurzy čalounění'
                       : item.category === 'restaurovani'
@@ -1166,7 +1166,7 @@ export function App() {
                       ? 'Autoveteráni'
                       : 'Rodinná historie'}
                   </span>
-                  <h4 className="font-serif text-base sm:text-lg text-[#FAF6F0] leading-snug">
+                  <h4 className="font-serif text-base sm:text-lg text-[#141210] leading-snug">
                     {item.title}
                   </h4>
                 </div>
@@ -1179,7 +1179,7 @@ export function App() {
             <div className="mt-10 text-center">
               <button
                 onClick={() => setShowAllGallery(!showAllGallery)}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#FAF6F0] hover:bg-[#EFE7DA] text-[#1F1A17] font-medium text-sm border border-[#C69C49]/60 shadow-sm transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#141210] hover:bg-[#221E1A] text-[#F2EBDD] font-medium text-sm border border-[#D4AF63]/60 shadow-sm transition-all cursor-pointer"
               >
                 <span>
                   {showAllGallery
@@ -1193,13 +1193,13 @@ export function App() {
       </section>
 
       {/* CONTACT & WORKSHOP FOOTER SECTION */}
-      <footer id="kontakt" className="bg-[#181310] text-[#EAE0D5] pt-20 pb-12 border-t border-[#C69C49]/30">
+      <footer id="kontakt" className="bg-[#0A0908] text-[#EAE0D5] pt-20 pb-12 border-t border-[#D4AF63]/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-12 pb-16 border-b border-[#332922]">
+          <div className="grid lg:grid-cols-12 gap-12 pb-16 border-b border-[#D5CBBB]">
             {/* Brand & Story Column (4 cols) */}
             <div className="lg:col-span-4 space-y-5">
               <div className="flex items-center gap-3.5">
-                <div className="w-16 h-14 rounded-xl overflow-hidden border border-[#C69C49]/50 bg-[#181310]">
+                <div className="w-16 h-14 rounded-xl overflow-hidden border border-[#D4AF63]/50 bg-[#0A0908]">
                   <img
                     src="/images/logo-zlate.jpg"
                     alt="CHARIVARI HOME"
@@ -1207,10 +1207,10 @@ export function App() {
                   />
                 </div>
                 <div>
-                  <div className="font-serif text-2xl font-bold text-[#FAF6F0] tracking-wider">
+                  <div className="font-serif text-2xl font-bold text-[#141210] tracking-wider">
                     CHARIVARI HOME
                   </div>
-                  <div className="text-xs text-[#DFB968] uppercase tracking-widest">
+                  <div className="text-xs text-[#E6C27A] uppercase tracking-widest">
                     {CONTACT_INFO.owner}
                   </div>
                 </div>
@@ -1225,9 +1225,9 @@ export function App() {
                   href={CONTACT_INFO.facebookUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#261E19] hover:bg-[#332922] text-[#FAF6F0] text-xs font-medium border border-[#C69C49]/30 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#261E19] hover:bg-[#D5CBBB] text-[#141210] text-xs font-medium border border-[#D4AF63]/30 transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#DFB968]" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[#E6C27A]" />
                   <span>Sledujte nás na Facebooku</span>
                 </a>
               </div>
@@ -1235,46 +1235,46 @@ export function App() {
 
             {/* Direct Contacts Column (4 cols) */}
             <div className="lg:col-span-4 space-y-4">
-              <h3 className="font-serif text-2xl font-semibold text-[#FAF6F0]">
+              <h3 className="font-serif text-2xl font-semibold text-[#141210]">
                 Spojte se s námi
               </h3>
               <div className="space-y-3 text-sm">
-                <div className="p-3.5 rounded-xl bg-[#221B17] border border-[#332922]">
-                  <div className="text-xs text-[#DFB968] uppercase tracking-wider font-semibold">
+                <div className="p-3.5 rounded-xl bg-[#221B17] border border-[#D5CBBB]">
+                  <div className="text-xs text-[#E6C27A] uppercase tracking-wider font-semibold">
                     Restaurování &amp; Hlavní kontakt (Ladislav Tobiášek)
                   </div>
                   <a
                     href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-                    className="flex items-center gap-2 text-base font-semibold text-[#FAF6F0] hover:text-[#DFB968] mt-1"
+                    className="flex items-center gap-2 text-base font-semibold text-[#141210] hover:text-[#E6C27A] mt-1"
                   >
-                    <Phone className="w-4 h-4 text-[#C69C49]" />
+                    <Phone className="w-4 h-4 text-[#D4AF63]" />
                     <span>{CONTACT_INFO.phoneMainDisplay}</span>
                   </a>
                   <a
                     href={`mailto:${CONTACT_INFO.emailMain}`}
-                    className="flex items-center gap-2 text-xs text-[#C6B8A8] hover:text-[#DFB968] mt-1"
+                    className="flex items-center gap-2 text-xs text-[#C6B8A8] hover:text-[#E6C27A] mt-1"
                   >
-                    <Mail className="w-3.5 h-3.5 text-[#C69C49]" />
+                    <Mail className="w-3.5 h-3.5 text-[#D4AF63]" />
                     <span>{CONTACT_INFO.emailMain}</span>
                   </a>
                 </div>
 
-                <div className="p-3.5 rounded-xl bg-[#221B17] border border-[#332922]">
-                  <div className="text-xs text-[#DFB968] uppercase tracking-wider font-semibold">
+                <div className="p-3.5 rounded-xl bg-[#221B17] border border-[#D5CBBB]">
+                  <div className="text-xs text-[#E6C27A] uppercase tracking-wider font-semibold">
                     Kurzy čalounění &amp; Dárkové poukazy
                   </div>
                   <a
                     href={`tel:${CONTACT_INFO.phoneCourses.replace(/\s+/g, '')}`}
-                    className="flex items-center gap-2 text-base font-semibold text-[#FAF6F0] hover:text-[#DFB968] mt-1"
+                    className="flex items-center gap-2 text-base font-semibold text-[#141210] hover:text-[#E6C27A] mt-1"
                   >
-                    <Phone className="w-4 h-4 text-[#C69C49]" />
+                    <Phone className="w-4 h-4 text-[#D4AF63]" />
                     <span>{CONTACT_INFO.phoneCoursesDisplay}</span>
                   </a>
                   <a
                     href={`mailto:${CONTACT_INFO.emailCourses}`}
-                    className="flex items-center gap-2 text-xs text-[#C6B8A8] hover:text-[#DFB968] mt-1"
+                    className="flex items-center gap-2 text-xs text-[#C6B8A8] hover:text-[#E6C27A] mt-1"
                   >
-                    <Mail className="w-3.5 h-3.5 text-[#C69C49]" />
+                    <Mail className="w-3.5 h-3.5 text-[#D4AF63]" />
                     <span>{CONTACT_INFO.emailCourses}</span>
                   </a>
                 </div>
@@ -1283,20 +1283,20 @@ export function App() {
 
             {/* Address & Quick Booking Column (4 cols) */}
             <div className="lg:col-span-4 space-y-4">
-              <h3 className="font-serif text-2xl font-semibold text-[#FAF6F0]">
+              <h3 className="font-serif text-2xl font-semibold text-[#141210]">
                 Kde najdete naši dílnu
               </h3>
-              <div className="p-4 rounded-xl bg-[#221B17] border border-[#332922] space-y-2">
+              <div className="p-4 rounded-xl bg-[#221B17] border border-[#D5CBBB] space-y-2">
                 <div className="flex items-start gap-2.5">
-                  <MapPin className="w-5 h-5 text-[#DFB968] shrink-0 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-[#E6C27A] shrink-0 mt-0.5" />
                   <div>
-                    <div className="font-semibold text-[#FAF6F0]">CHARIVARI HOME</div>
+                    <div className="font-semibold text-[#141210]">CHARIVARI HOME</div>
                     <div className="text-sm text-[#C6B8A8]">Nová Ves 22, 277 52 (okres Mělník)</div>
                     <a
                       href="https://maps.google.com/?q=Nová+Ves+22,+277+52"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-[#DFB968] hover:underline mt-1"
+                      className="inline-flex items-center gap-1 text-xs text-[#E6C27A] hover:underline mt-1"
                     >
                       <span>Otevřít v Google Mapách</span>
                       <ExternalLink className="w-3 h-3" />
@@ -1309,7 +1309,7 @@ export function App() {
                 href={CONTACT_INFO.reservantoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#C69C49] hover:bg-[#d4ab57] text-[#181310] font-semibold text-sm shadow-lg transition-all"
+                className="w-full flex items-center justify-center gap-2.5 py-4 px-6 rounded-xl bg-[#D4AF63] hover:bg-[#E6C27A] text-[#0A0908] font-semibold text-sm shadow-lg transition-all"
               >
                 <Calendar className="w-4 h-4" />
                 <span>Rezervace termínů kurzů online</span>
@@ -1319,7 +1319,7 @@ export function App() {
           </div>
 
           {/* Legal: operator identification, copyright & privacy */}
-          <div className="pt-8 grid md:grid-cols-3 gap-6 text-xs text-[#8C7D70] leading-relaxed border-b border-[#332922] pb-8">
+          <div className="pt-8 grid md:grid-cols-3 gap-6 text-xs text-[#8C7D70] leading-relaxed border-b border-[#D5CBBB] pb-8">
             <div>
               <h4 className="text-[11px] uppercase tracking-wider font-semibold text-[#C6B8A8] mb-1.5">
                 Provozovatel
@@ -1359,13 +1359,13 @@ export function App() {
                   href="https://www.reservanto.cz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline hover:text-[#DFB968]"
+                  className="underline hover:text-[#E6C27A]"
                 >
                   Reservanto
                 </a>
                 , který se řídí vlastními podmínkami. Své dotazy či žádosti (přístup, oprava,
                 výmaz údajů) směřujte na{' '}
-                <a href={`mailto:${CONTACT_INFO.emailMain}`} className="underline hover:text-[#DFB968]">
+                <a href={`mailto:${CONTACT_INFO.emailMain}`} className="underline hover:text-[#E6C27A]">
                   {CONTACT_INFO.emailMain}
                 </a>
                 .
@@ -1380,19 +1380,19 @@ export function App() {
               vyhrazena. Web vytvořil Oliver Tobiášek.
             </div>
             <div className="flex flex-wrap gap-5">
-              <a href="#kurzy" className="hover:text-[#DFB968]">
+              <a href="#kurzy" className="hover:text-[#E6C27A]">
                 Kurzy
               </a>
-              <a href="#restaurovani" className="hover:text-[#DFB968]">
+              <a href="#restaurovani" className="hover:text-[#E6C27A]">
                 Restaurování
               </a>
-              <a href="#veterani" className="hover:text-[#DFB968]">
+              <a href="#veterani" className="hover:text-[#E6C27A]">
                 Autoveteráni
               </a>
-              <a href="#poukazy" className="hover:text-[#DFB968]">
+              <a href="#poukazy" className="hover:text-[#E6C27A]">
                 Dárkové poukazy
               </a>
-              <a href="#historie" className="hover:text-[#DFB968]">
+              <a href="#historie" className="hover:text-[#E6C27A]">
                 O mně
               </a>
             </div>
@@ -1413,7 +1413,7 @@ export function App() {
             <button
               onClick={() => setLightboxItem(null)}
               aria-label="Zavřít náhled"
-              className="absolute -top-12 right-0 p-2.5 rounded-full bg-[#261E19] text-[#FAF6F0] hover:bg-[#3A2E27] border border-[#C69C49]/40 cursor-pointer"
+              className="absolute -top-12 right-0 p-2.5 rounded-full bg-[#261E19] text-[#141210] hover:bg-[#3A2E27] border border-[#D4AF63]/40 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1429,7 +1429,7 @@ export function App() {
                   }
                 }}
                 aria-label="Předchozí fotka"
-                className="hidden sm:flex absolute left-2 p-3 rounded-full bg-[#181310]/80 hover:bg-[#181310] text-[#DFB968] border border-[#C69C49]/40 cursor-pointer"
+                className="hidden sm:flex absolute left-2 p-3 rounded-full bg-[#0A0908]/80 hover:bg-[#0A0908] text-[#E6C27A] border border-[#D4AF63]/40 cursor-pointer"
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
@@ -1437,7 +1437,7 @@ export function App() {
               <img
                 src={lightboxItem.src}
                 alt={lightboxItem.title}
-                className="max-h-[75vh] w-auto rounded-2xl shadow-2xl border border-[#C69C49]/30 object-contain"
+                className="max-h-[75vh] w-auto rounded-2xl shadow-2xl border border-[#D4AF63]/30 object-contain"
               />
 
               <button
@@ -1448,14 +1448,14 @@ export function App() {
                   }
                 }}
                 aria-label="Další fotka"
-                className="hidden sm:flex absolute right-2 p-3 rounded-full bg-[#181310]/80 hover:bg-[#181310] text-[#DFB968] border border-[#C69C49]/40 cursor-pointer"
+                className="hidden sm:flex absolute right-2 p-3 rounded-full bg-[#0A0908]/80 hover:bg-[#0A0908] text-[#E6C27A] border border-[#D4AF63]/40 cursor-pointer"
               >
                 <ChevronRight className="w-6 h-6" />
               </button>
             </div>
 
             <div className="mt-5 text-center max-w-2xl">
-              <h3 className="font-serif text-2xl text-[#FAF6F0] font-semibold">
+              <h3 className="font-serif text-2xl text-[#141210] font-semibold">
                 {lightboxItem.title}
               </h3>
               {lightboxItem.description && (
