@@ -6,6 +6,202 @@ export interface GalleryItem {
   description?: string;
 }
 
+export interface SeoRoute {
+  path:
+    | '/'
+    | '/kurzy/'
+    | '/t/'
+    | '/zakazkove-restaurovani/'
+    | '/autoveterani-renovace/'
+    | '/darkove-poukazy/'
+    | '/o-me/'
+    | '/galerie/'
+    | '/kontakt/';
+  canonical: string;
+  title: string;
+  description: string;
+  h1: string;
+  lead: string;
+  breadcrumb: string;
+  ogImage: string;
+  sectionId: 'kurzy' | 'restaurovani' | 'veterani' | 'poukazy' | 'historie' | 'galerie' | 'kontakt' | null;
+  priority: string;
+  changefreq: 'daily' | 'weekly' | 'monthly';
+}
+
+export const SITE_ORIGIN = 'https://www.charivarihome.com';
+
+export const SEO_ROUTES: SeoRoute[] = [
+  {
+    path: '/',
+    canonical: `${SITE_ORIGIN}/`,
+    title: 'CHARIVARI HOME | Ladislav Tobiášek – Restaurátor, čalouník a kurzy čalounění',
+    description:
+      'Čalounická a restaurátorská dílna Ladislava Tobiáška v Nové Vsi u Mělníka. Zážitkové kurzy renovace a čalounění nábytku, výroba čalouněného taburetu, zakázkové restaurování, interiéry autoveteránů a dárkové poukazy.',
+    h1: 'Dáváme věcem nový život a vašemu interiéru duši.',
+    lead: 'Rodinná čalounická a restaurátorská dílna Ladislava Tobiáška v Nové Vsi u Mělníka.',
+    breadcrumb: 'Domů',
+    ogImage: `${SITE_ORIGIN}/images/service-kurzy.jpg`,
+    sectionId: null,
+    priority: '1.0',
+    changefreq: 'daily',
+  },
+  {
+    path: '/kurzy/',
+    canonical: `${SITE_ORIGIN}/kurzy/`,
+    title: 'Kurzy renovace a čalounění nábytku (3 300 Kč) | CHARIVARI HOME',
+    description:
+      'Celodenní zážitkový kurz renovace a čalounění vlastního kusu nábytku (cca 8 hodin) pod odborným vedením Ladislava Tobiáška v Nové Vsi u Mělníka. Profesionální nářadí, vzorníky látek a občerstvení v ceně.',
+    h1: 'Kurzy renovace a čalounění nábytku v naší dílně',
+    lead: 'Přineste si vlastní židli, stoličku, křesílko nebo podsedák a vdechněte mu pod odborným vedením nový život během celodenního řemeslného kurzu (cca 8 hodin) v Nové Vsi u Mělníka.',
+    breadcrumb: 'Kurzy čalounění',
+    ogImage: `${SITE_ORIGIN}/images/service-kurzy.jpg`,
+    sectionId: 'kurzy',
+    priority: '0.9',
+    changefreq: 'weekly',
+  },
+  {
+    path: '/t/',
+    canonical: `${SITE_ORIGIN}/t/`,
+    title: 'Kurz Výroba čalouněného taburetu za 1 den (3 900 Kč) | CHARIVARI HOME',
+    description:
+      'Vyrobte si vlastní designový čalouněný taburet od dřevěného korpusu až po potah a zdobení za jediný den (8 hodin) v dílně Charivari Home u Mělníka. Vhodné i pro úplné začátečníky.',
+    h1: 'Kurz Výroba čalouněného taburetu za jediný den',
+    lead: 'Odejděte po 8 hodinách s vlastnoručně vyrobeným designovým taburetem! Na výběr máte 3 velikosti smrkových korpusů, tuhost výplně, ozdobné knoflíky či paspuli i povrchovou úpravu nožiček.',
+    breadcrumb: 'Výroba čalouněného taburetu',
+    ogImage: `${SITE_ORIGIN}/images/kurz-7.jpg`,
+    sectionId: 'kurzy',
+    priority: '0.9',
+    changefreq: 'weekly',
+  },
+  {
+    path: '/zakazkove-restaurovani/',
+    canonical: `${SITE_ORIGIN}/zakazkove-restaurovani/`,
+    title: 'Zakázkové restaurování a čalounění nábytku | CHARIVARI HOME',
+    description:
+      'Kompletní čalounické práce a restaurování starožitného i moderního sedacího nábytku. Ruční vyvazování pružin, africká tráva, koňské žíně, lněné popruhy a šelaková politura dřeva.',
+    h1: 'Zakázkové restaurování a čalounění historického i moderního nábytku',
+    lead: 'Zachováváme historickou patinu a duši nábytku při plné funkčnosti pro moderní interiér. Pracujeme s tradičními materiály – africkou trávou, koňskými žíněmi, lněnými popruhy, klasickými pružinami a šelakovou politurou.',
+    breadcrumb: 'Zakázkové restaurování',
+    ogImage: `${SITE_ORIGIN}/images/service-restaurovani.jpg`,
+    sectionId: 'restaurovani',
+    priority: '0.9',
+    changefreq: 'weekly',
+  },
+  {
+    path: '/autoveterani-renovace/',
+    canonical: `${SITE_ORIGIN}/autoveterani-renovace/`,
+    title: 'Čalounění autoveteránů a renovace sedel motocyklů | CHARIVARI HOME',
+    description:
+      'Renovace sedel motocyklů a kompletní čalounění interiérů historických vozů (sedadla, dveřní výplně, stropnice) s důrazem na dobovou věrnost v dílně Charivari Home.',
+    h1: 'Čalounění interiérů autoveteránů a renovace sedel motocyklů',
+    lead: 'Vracíme komfort a lesk kabinám historických vozů i motocyklovým sedlům. Kombinujeme tradiční čalounické postupy, pravou kůži a odolné materiály s respektem k dobové originalitě každého stroje.',
+    breadcrumb: 'Autoveteráni a motocykly',
+    ogImage: `${SITE_ORIGIN}/images/service-veterani.jpg`,
+    sectionId: 'veterani',
+    priority: '0.9',
+    changefreq: 'weekly',
+  },
+  {
+    path: '/darkove-poukazy/',
+    canonical: `${SITE_ORIGIN}/darkove-poukazy/`,
+    title: 'Dárkové poukazy na kurzy čalounění a výroby taburetu | CHARIVARI HOME',
+    description:
+      'Darujte originální řemeslný zážitek s platností 1 rok – dárkový voucher na kurz renovace a čalounění nábytku (3 300 Kč) nebo výroby čalouněného taburetu (3 900 Kč) s osobním věnováním.',
+    h1: 'Dárkové poukazy na kurzy čalounění s osobním věnováním',
+    lead: 'Darujte svým blízkým celodenní zážitek v čalounické dílně a vlastnoručně zrenovovaný kus nábytku nebo nový taburet. Na voucher rádi doplníme vaše osobní věnování i fotografii.',
+    breadcrumb: 'Dárkové poukazy',
+    ogImage: `${SITE_ORIGIN}/images/voucher.jpg`,
+    sectionId: 'poukazy',
+    priority: '0.8',
+    changefreq: 'weekly',
+  },
+  {
+    path: '/o-me/',
+    canonical: `${SITE_ORIGIN}/o-me/`,
+    title: 'O mně a rodinná historie – Ladislav Tobiášek | CHARIVARI HOME',
+    description:
+      'Příběh tří generací čalouníků rodiny Tobiáškových od 30. let 20. století v Praze 7 Holešovicích (praděda František a děda Ladislav) až po dnešní dílnu Charivari Home v Nové Vsi u Mělníka.',
+    h1: 'O mně – Ladislav Tobiášek a 90 let rodinné tradice čalounění',
+    lead: 'Restaurování a čalounění se věnuji téměř 30 let. Naše rodinné řemeslo sahá do 30. let 20. století v pražských Holešovicích, kde čalounickou rukodílnu vedl můj praděda František a děda Ladislav.',
+    breadcrumb: 'O mně a historie',
+    ogImage: `${SITE_ORIGIN}/images/hist-1-frantisek.jpg`,
+    sectionId: 'historie',
+    priority: '0.8',
+    changefreq: 'monthly',
+  },
+  {
+    path: '/galerie/',
+    canonical: `${SITE_ORIGIN}/galerie/`,
+    title: 'Galerie realizací – čalounění, restaurování, kurzy a veteráni | CHARIVARI HOME',
+    description:
+      'Prohlédněte si fotografie z čalounické a restaurátorské dílny Charivari Home: zrestaurovaná křesla, židle, lavice na míru, interiéry autoveteránů a práce účastníků kurzů.',
+    h1: 'Galerie realizací a ukázky prací z dílny Charivari Home',
+    lead: 'Prohlédněte si dokončené čalounické a restaurátorské zakázky, proměny historických křesel a židlí, renovované interiéry autoveteránů i atmosféru z našich celodenních kurzů.',
+    breadcrumb: 'Galerie realizací',
+    ogImage: `${SITE_ORIGIN}/images/rest-kreslo.jpg`,
+    sectionId: 'galerie',
+    priority: '0.8',
+    changefreq: 'weekly',
+  },
+  {
+    path: '/kontakt/',
+    canonical: `${SITE_ORIGIN}/kontakt/`,
+    title: 'Kontakt a čalounická dílna – Nová Ves 22 u Mělníka | CHARIVARI HOME',
+    description:
+      'Kontaktujte čalounickou a restaurátorskou dílnu CHARIVARI HOME (Ladislav Tobiášek, Nová Ves 22, 277 52 u Mělníka). Tel.: +420 777 687 600, kurzy: +420 606 735 895.',
+    h1: 'Kontakt a adresa dílny CHARIVARI HOME – Nová Ves u Mělníka',
+    lead: 'Najdete nás v Nové Vsi 22 u Mělníka (277 52). Ozvěte se nám telefonicky nebo e-mailem ohledně zakázkového restaurování, čalounění autoveteránů, dárkových poukazů nebo termínů kurzů.',
+    breadcrumb: 'Kontakt',
+    ogImage: `${SITE_ORIGIN}/images/logo-zlate.jpg`,
+    sectionId: 'kontakt',
+    priority: '0.8',
+    changefreq: 'monthly',
+  },
+];
+
+export function normalizeRoutePath(rawPath?: string): SeoRoute['path'] {
+  if (!rawPath || rawPath === '/') return '/';
+  const clean = rawPath.split('?')[0].split('#')[0].replace(/\/+$/, '').toLowerCase();
+  switch (clean) {
+    case '/kurzy':
+    case '/kurzy-calouneni':
+      return '/kurzy/';
+    case '/t':
+    case '/taburet':
+    case '/vyroba-taburetu':
+      return '/t/';
+    case '/zakazkove-restaurovani':
+    case '/restaurovani':
+      return '/zakazkove-restaurovani/';
+    case '/autoveterani-renovace':
+    case '/veterani':
+    case '/autoveterani':
+      return '/autoveterani-renovace/';
+    case '/darkove-poukazy':
+    case '/poukazy':
+    case '/voucher':
+      return '/darkove-poukazy/';
+    case '/o-me':
+    case '/historie':
+    case '/o-nas':
+      return '/o-me/';
+    case '/galerie':
+      return '/galerie/';
+    case '/kontakt':
+    case '/kontakty':
+    case '/contact-us':
+      return '/kontakt/';
+    default:
+      return '/';
+  }
+}
+
+export function getSeoRoute(rawPath?: string): SeoRoute {
+  const normalized = normalizeRoutePath(rawPath);
+  return SEO_ROUTES.find((r) => r.path === normalized) ?? SEO_ROUTES[0];
+}
+
 export const CONTACT_INFO = {
   owner: 'Ladislav Tobiášek',
   role: 'Restaurátor a čalouník, lektor kurzů',

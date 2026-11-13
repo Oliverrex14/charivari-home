@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import {
   Calendar,
   Phone,
@@ -29,18 +29,38 @@ import {
   HISTORICAL_PHOTOS,
   COURSES,
   GALLERY_ITEMS,
+  SEO_ROUTES,
+  getSeoRoute,
+  normalizeRoutePath,
   type GalleryItem,
+  type SeoRoute,
 } from './data/siteData';
 
-export function App() {
+export interface AppProps {
+  initialPath?: string;
+}
+
+export function App({ initialPath }: AppProps = {}) {
+  const [currentPath, setCurrentPath] = useState<SeoRoute['path']>(() =>
+    normalizeRoutePath(
+      initialPath ?? (typeof window !== 'undefined' ? window.location.pathname : '/')
+    )
+  );
+  const activeRoute = getSeoRoute(currentPath);
+  const isSubpage = activeRoute.path !== '/';
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState<'light' | 'dark'>(() =>
-    document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'
+    typeof document !== 'undefined' && document.documentElement.dataset.theme === 'dark'
+      ? 'dark'
+      : 'light'
   );
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
-    document.documentElement.dataset.theme = next;
+    if (typeof document !== 'undefined') {
+      document.documentElement.dataset.theme = next;
+    }
     try {
       localStorage.setItem('theme', next);
     } catch {
@@ -50,13 +70,93 @@ export function App() {
   const [activeGalleryCategory, setActiveGalleryCategory] = useState<
     'all' | 'kurzy' | 'restaurovani' | 'veterani' | 'historie'
   >('all');
-  const [showAllGallery, setShowAllGallery] = useState(false);
+  const [showAllGallery, setShowAllGallery] = useState<boolean>(
+    () => activeRoute.path === '/galerie/'
+  );
   const [lightboxItem, setLightboxItem] = useState<GalleryItem | null>(null);
 
   // Gift voucher interactive state
-  const [selectedVoucherCourse, setSelectedVoucherCourse] = useState<'3300' | '3900'>('3300');
+  const [selectedVoucherCourse, setSelectedVoucherCourse] = useState<'3300' | '3900'>(() =>
+    activeRoute.path === '/t/' ? '3900' : '3300'
+  );
   const [voucherRecipient, setVoucherRecipient] = useState('');
   const [voucherDedication, setVoucherDedication] = useState('');
+
+  // Sync browser back/forward navigation & document head metadata
+  useEffect(() => {
+    const applySeoHead = (route: SeoRoute) => {
+      document.title = route.title;
+      const descEl = document.querySelector('meta[name="description"]');
+      if (descEl) descEl.setAttribute('content', route.description);
+      const canonEl = document.querySelector('link[rel="canonical"]');
+      if (canonEl) canonEl.setAttribute('href', route.canonical);
+      const ogTitleEl = document.querySelector('meta[property="og:title"]');
+      if (ogTitleEl) ogTitleEl.setAttribute('content', route.title);
+      const ogDescEl = document.querySelector('meta[property="og:description"]');
+      if (ogDescEl) ogDescEl.setAttribute('content', route.description);
+      const ogUrlEl = document.querySelector('meta[property="og:url"]');
+      if (ogUrlEl) ogUrlEl.setAttribute('content', route.canonical);
+    };
+
+    applySeoHead(activeRoute);
+
+    const handlePopState = () => {
+      const nextPath = normalizeRoutePath(window.location.pathname);
+      setCurrentPath(nextPath);
+      if (nextPath === '/galerie/') {
+        setShowAllGallery(true);
+      }
+      if (nextPath === '/t/') {
+        setSelectedVoucherCourse('3900');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeRoute]);
+
+  const handleRouteClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    targetPath: SeoRoute['path'],
+    scrollTargetId?: string
+  ) => {
+    if (
+      e.defaultPrevented ||
+      e.button !== 0 ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.shiftKey ||
+      e.altKey
+    ) {
+      return;
+    }
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    const normalized = normalizeRoutePath(targetPath);
+    if (normalized === '/galerie/') {
+      setShowAllGallery(true);
+    }
+    if (normalized === '/t/') {
+      setSelectedVoucherCourse('3900');
+    }
+    setCurrentPath(normalized);
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname !== normalized) {
+        window.history.pushState({}, '', normalized);
+      }
+      if (scrollTargetId) {
+        requestAnimationFrame(() => {
+          const el = document.getElementById(scrollTargetId);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
 
   // Input sanitization helper against injection / control characters
   const sanitizeInput = (value: string, maxLen: number) =>
@@ -109,428 +209,276 @@ export function App() {
     window.location.href = `mailto:${CONTACT_INFO.emailCourses}?subject=${subject}&body=${body}`;
   };
 
-  return (
-    <div className="min-h-screen flex flex-col bg-[var(--c-paper)] text-[var(--c-ink)]">
-      {/* Top Heritage Bar */}
-      <div className="bg-[#121212] text-[#E4E1DA] text-xs sm:text-sm py-2.5 px-4 border-b border-[var(--c-acc)]/25">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-[#E3A59B]">
-            <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            <span className="font-medium tracking-wide">
-              Rodinná čalounická a restaurátorská dílna Ladislava Tobiáška
-            </span>
+  // Hero Heading Tag: h1 on homepage (/), h2 on dedicated subpages so each page has strictly one h1
+  const HeroHeadingTag = isSubpage ? 'h2' : 'h1';
+
+  // Sections defined as reusable blocks so the active subpage's primary section renders first at the top
+  const heroSection = (
+    <section className="relative overflow-hidden bg-linen pt-10 pb-20 lg:pt-16 lg:pb-28 border-b border-[var(--c-line)]">
+      {/* Decorative warm glow */}
+      <div className="pointer-events-none absolute -top-32 right-0 w-[34rem] h-[34rem] rounded-full bg-[var(--c-acc)]/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 left-10 w-[26rem] h-[26rem] rounded-full bg-[var(--c-acc2)]/8 blur-3xl" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+          {/* Hero Copy (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[var(--c-alt2)] border border-[var(--c-acc)]/40 text-[var(--c-acc3)] text-xs sm:text-sm font-medium">
+              <Award className="w-4 h-4 text-[var(--c-acc2)]" />
+              <span>Téměř 30 let zkušeností • Tradice 3. generace čalouníků</span>
+            </div>
+
+            <HeroHeadingTag className="font-serif text-4xl sm:text-6xl lg:text-[4.15rem] font-semibold text-[var(--c-ink)] leading-[1.08] tracking-tight">
+              Dáváme věcem{' '}
+              <span className="italic font-normal text-[var(--c-acc2)]">nový život</span> a vašemu
+              interiéru duši.
+            </HeroHeadingTag>
+
+            <p className="text-base sm:text-lg text-[var(--c-g44)] leading-relaxed max-w-2xl">
+              Jmenuji se <strong className="font-semibold text-[var(--c-ink)]">Ladislav Tobiášek</strong>.
+              V čalounické a restaurátorská dílně <strong>Charivari Home</strong> v Nové Vsi u
+              Mělníka propojujeme tradiční rukodělné postupy mého pradědy Františka s moderními
+              požadavky na funkčnost a estetiku. Přijďte si k nám vlastnoručně zrenovovat kus
+              nábytku na kurzu, nebo nám svěřte svůj rodinný poklad či autoveterána.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <a
+                href={CONTACT_INFO.reservantoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-base shadow-lg shadow-[var(--c-ink)]/15 border border-[var(--c-acc)]/60 transition-all group"
+              >
+                <Calendar className="w-5 h-5 text-[var(--c-icon)]" />
+                <span>Rezervace termínů kurzů</span>
+                <ExternalLink className="w-4 h-4 text-[var(--c-icon)] group-hover:translate-x-0.5 transition-transform" />
+              </a>
+
+              <a
+                href="/zakazkove-restaurovani/"
+                onClick={(e) => handleRouteClick(e, '/zakazkove-restaurovani/')}
+                className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-base border border-[var(--c-acc)]/50 transition-all"
+              >
+                <Hammer className="w-4 h-4 text-[var(--c-acc2)]" />
+                <span>Zakázkové restaurování</span>
+              </a>
+            </div>
+
+            {/* Key Trust Metrics */}
+            <div className="pt-6 grid grid-cols-3 gap-4 sm:gap-8 border-t border-[var(--c-line)] max-w-xl">
+              <div>
+                <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
+                  ~90 let
+                </div>
+                <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
+                  rodinných kořenů v čalounění
+                </div>
+              </div>
+              <div>
+                <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
+                  1 den
+                </div>
+                <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
+                  stačí k výrobě vlastního taburetu
+                </div>
+              </div>
+              <div>
+                <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
+                  100%
+                </div>
+                <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
+                  poctivá ruční práce a materiály
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="flex items-center gap-5 text-xs sm:text-sm">
-            <a
-              href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-              className="flex items-center gap-1.5 hover:text-[#E3A59B] transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 text-[var(--c-acc)]" />
-              <span>{CONTACT_INFO.phoneMainDisplay}</span>
-            </a>
-            <span className="hidden md:inline text-[var(--c-acc)]/40">|</span>
-            <a
-              href="#kontakt"
-              className="hidden md:flex items-center gap-1.5 hover:text-[#E3A59B] transition-colors"
-            >
-              <MapPin className="w-3.5 h-3.5 text-[var(--c-acc)]" />
-              <span>{CONTACT_INFO.address}</span>
-            </a>
+
+          {/* Hero Visual Collage (5 cols) */}
+          <div className="lg:col-span-5 relative">
+            <div className="grid grid-cols-12 gap-4 items-center">
+              {/* Main Workshop / Course Image */}
+              <div className="col-span-7 relative rounded-2xl overflow-hidden shadow-xl border-4 border-[var(--c-paper)] bg-[#1C1C1C] aspect-[4/5]">
+                <img
+                  src="/images/service-kurzy.jpg"
+                  alt="Kurzy čalounění Charivari Home"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/80 via-transparent to-transparent" />
+                <div className="absolute bottom-3 left-3 right-3 text-[#FAFAF7]">
+                  <span className="text-[11px] uppercase tracking-wider text-[#E3A59B] font-semibold">
+                    Zážitkové kurzy
+                  </span>
+                  <p className="font-serif text-lg leading-snug">
+                    Vlastnoruční renovace a čalounění v naší dílně
+                  </p>
+                </div>
+              </div>
+
+              {/* Stacked Secondary Images */}
+              <div className="col-span-5 space-y-4">
+                <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[var(--c-paper)] aspect-square">
+                  <img
+                    src="/images/rest-kreslo.jpg"
+                    alt="Restaurované křeslo"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[var(--c-paper)] aspect-[4/5]">
+                  <img
+                    src="/images/hist-1-frantisek.jpg"
+                    alt="Praděda František a děda Ladislav"
+                    className="w-full h-full object-cover archival-photo"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/85 via-transparent to-transparent" />
+                  <div className="absolute bottom-2.5 left-2.5 right-2.5 text-[#FAFAF7]">
+                    <span className="text-[10px] uppercase tracking-wider text-[#E3A59B]">
+                      Holešovice • 30. léta
+                    </span>
+                    <p className="font-serif text-xs leading-tight">
+                      Praděda František a děda Ladislav
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+    </section>
+  );
 
-      {/* Main Sticky Header */}
-      <header className="sticky top-0 z-40 bg-[var(--c-paper)]/95 backdrop-blur-md border-b border-[var(--c-line)] transition-all">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-          {/* Brand Logo */}
-          <a href="#" className="flex items-center gap-3.5 group">
-            <div className="w-14 h-12 rounded-lg overflow-hidden border border-[var(--c-acc)]/40 bg-[#121212] shadow-sm shrink-0">
-              <img
-                src="/images/logo-zlate.jpg"
-                alt="CHARIVARI HOME logo"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div>
-              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-wider text-[var(--c-ink)] leading-none">
-                CHARIVARI HOME
-              </span>
-              <span className="block text-[11px] uppercase tracking-[0.18em] text-[var(--c-g77)] mt-1">
-                Restaurování &amp; Kurzy čalounění
-              </span>
-            </div>
-          </a>
+  const pillarsSection = (
+    <section id="sluzby" className="py-20 bg-[var(--c-paper)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
+            Řemeslo pod jednou střechou
+          </span>
+          <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
+            Čtyři pilíře dílny Charivari Home
+          </h2>
+          <p className="text-[var(--c-g55)] mt-3 text-base sm:text-lg">
+            <em>Charivari</em> je slovo, které v sobě nese pestrost, rozmanitost a radost. Máme úctu k
+            barokním křeslům, ikonickému designu 20. století i historickým vozům.
+          </p>
+        </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-[var(--c-g2e)]">
-            <a href="#sluzby" className="hover:text-[var(--c-acc2)] transition-colors">
-              Co nabízíme
-            </a>
-            <a href="#kurzy" className="hover:text-[var(--c-acc2)] transition-colors">
-              Kurzy čalounění
-            </a>
-            <a href="#restaurovani" className="hover:text-[var(--c-acc2)] transition-colors">
-              Zakázkové restaurování
-            </a>
-            <a href="#veterani" className="hover:text-[var(--c-acc2)] transition-colors">
-              Autoveteráni
-            </a>
-            <a href="#poukazy" className="hover:text-[var(--c-acc2)] transition-colors">
-              Dárkové poukazy
-            </a>
-            <a href="#historie" className="hover:text-[var(--c-acc2)] transition-colors">
-              Rodinná historie
-            </a>
-            <a href="#galerie" className="hover:text-[var(--c-acc2)] transition-colors">
-              Galerie
-            </a>
-            <a href="#kontakt" className="hover:text-[var(--c-acc2)] transition-colors">
-              Kontakt
-            </a>
-          </nav>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            {
+              title: 'Kurzy renovace a čalounění',
+              subtitle: 'Od 3 300 Kč • Celodenní zážitek',
+              desc: 'Přineste si vlastní židli či křesílko nebo si za 8 hodin vyrobte zbrusu nový čalouněný taburet.',
+              img: '/images/service-kurzy.jpg',
+              href: '/kurzy/' as SeoRoute['path'],
+              icon: Scissors,
+              cta: 'Vybrat kurz',
+            },
+            {
+              title: 'Zakázkové restaurování',
+              subtitle: 'Tradiční postupy & materiály',
+              desc: 'Kompletní čalounické práce, vyvazování pružin, africká tráva, koňské žíně a šelaková politura dřeva.',
+              img: '/images/service-restaurovani.jpg',
+              href: '/zakazkove-restaurovani/' as SeoRoute['path'],
+              icon: Hammer,
+              cta: 'Více o restaurování',
+            },
+            {
+              title: 'Autoveteráni a motocykly',
+              subtitle: 'Sedla & interiéry s úctou k historii',
+              desc: 'Renovace sedel motocyklů, čalounění sedadel, dveří a stropnic historických vozů s dobovou věrností.',
+              img: '/images/service-veterani.jpg',
+              href: '/autoveterani-renovace/' as SeoRoute['path'],
+              icon: Car,
+              cta: 'Prohlédnout veterány',
+            },
+            {
+              title: 'Dárkové poukazy',
+              subtitle: 'Originální dárek s věnováním',
+              desc: 'Darujte zážitek a vlastnoručně vyrobený kus nábytku. Na voucher napíšeme osobní věnování i fotografii.',
+              img: '/images/service-poukazy.jpg',
+              href: '/darkove-poukazy/' as SeoRoute['path'],
+              icon: Gift,
+              cta: 'Objednat poukaz',
+            },
+          ].map((card) => {
+            const IconComponent = card.icon;
+            return (
+              <a
+                key={card.title}
+                href={card.href}
+                onClick={(e) => handleRouteClick(e, card.href)}
+                className="group bg-[var(--c-alt)] rounded-2xl overflow-hidden border border-[var(--c-line)] hover:border-[var(--c-acc)] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
+              >
+                <div className="relative h-56 overflow-hidden bg-[#1C1C1C]">
+                  <img
+                    src={card.img}
+                    alt={card.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-[#121212]/85 backdrop-blur-sm border border-[var(--c-acc)]/50 flex items-center justify-center text-[#E3A59B]">
+                    <IconComponent className="w-5 h-5" />
+                  </div>
+                </div>
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--c-acc2)]">
+                      {card.subtitle}
+                    </span>
+                    <h3 className="font-serif text-2xl font-semibold text-[var(--c-ink)] mt-1 group-hover:text-[var(--c-acc2)] transition-colors">
+                      {card.title}
+                    </h3>
+                    <p className="text-sm text-[var(--c-g55)] mt-2.5 leading-relaxed">{card.desc}</p>
+                  </div>
+                  <div className="mt-5 pt-4 border-t border-[var(--c-line)] flex items-center justify-between text-sm font-semibold text-[var(--c-ink)]">
+                    <span>{card.cta}</span>
+                    <ArrowRight className="w-4 h-4 text-[var(--c-acc2)] group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
 
-          {/* Header CTA */}
-          <div className="hidden sm:flex items-center gap-3">
+  const coursesSection = (
+    <section id="kurzy" className="py-24 bg-[var(--c-alt)] border-y border-[var(--c-line)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
+          <div className="max-w-2xl">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
+              Zážitkové řemeslné kurzy v Nové Vsi u Mělníka
+            </span>
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
+              Naučte se řemeslo, které dává smysl
+            </h2>
+            <p className="text-[var(--c-g44)] mt-3 text-base sm:text-lg">
+              „V Charivari nevyrábíme jen věci. Měníme způsob, jakým se díváte na svůj interiér. Z
+              věcí, které ostatní vyhazují, u nás společně tvoříme poklady.“
+            </p>
+          </div>
+          <div className="shrink-0">
             <a
               href={CONTACT_INFO.reservantoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--c-ink)] text-[var(--c-paper)] hover:bg-[var(--c-g26)] text-sm font-medium shadow-sm border border-[var(--c-acc)]/50 transition-all"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm shadow-md border border-[var(--c-acc)]/50"
             >
               <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
-              <span>Rezervace kurzů</span>
+              <span>Zobrazit volné termíny v kalendáři</span>
               <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
             </a>
           </div>
-
-          {/* Theme toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Přepnout na světlý režim' : 'Přepnout na tmavý režim'}
-            title={theme === 'dark' ? 'Světlý režim' : 'Tmavý režim'}
-            className="p-2.5 rounded-full border border-[var(--c-line)] text-[var(--c-ink)] hover:bg-[var(--c-alt2)] transition-colors cursor-pointer"
-          >
-            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Otevřít menu"
-            className="lg:hidden p-2.5 rounded-lg border border-[var(--c-line)] text-[var(--c-ink)] hover:bg-[var(--c-alt2)]"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
 
-        {/* Mobile Dropdown Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[var(--c-paper)] border-b border-[var(--c-line)] px-4 pt-3 pb-6 space-y-2 shadow-xl">
-            {[
-              { href: '#sluzby', label: 'Co nabízíme' },
-              { href: '#kurzy', label: 'Kurzy čalounění a výroba taburetu' },
-              { href: '#restaurovani', label: 'Zakázkové restaurování' },
-              { href: '#veterani', label: 'Autoveteráni a motocykly' },
-              { href: '#poukazy', label: 'Dárkové poukazy' },
-              { href: '#historie', label: 'O mně & Rodinná historie' },
-              { href: '#galerie', label: 'Galerie realizací' },
-              { href: '#kontakt', label: 'Kontakt' },
-            ].map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="block py-2.5 px-3 rounded-lg text-base font-medium text-[var(--c-ink)] hover:bg-[var(--c-alt2)]"
-              >
-                {link.label}
-              </a>
-            ))}
-            <div className="pt-3 flex flex-col gap-2.5">
-              <a
-                href={CONTACT_INFO.reservantoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[var(--c-ink)] text-[var(--c-paper)] font-medium border border-[var(--c-acc)]/50"
-              >
-                <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
-                <span>Rezervace termínů kurzů</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
-              </a>
-              <a
-                href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[var(--c-acc)] text-[var(--c-ink)] font-medium"
-              >
-                <Phone className="w-4 h-4 text-[var(--c-acc2)]" />
-                <span>Zavolat: {CONTACT_INFO.phoneMainDisplay}</span>
-              </a>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden bg-linen pt-10 pb-20 lg:pt-16 lg:pb-28 border-b border-[var(--c-line)]">
-        {/* Decorative warm glow */}
-        <div className="pointer-events-none absolute -top-32 right-0 w-[34rem] h-[34rem] rounded-full bg-[var(--c-acc)]/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-10 w-[26rem] h-[26rem] rounded-full bg-[var(--c-acc2)]/8 blur-3xl" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-            {/* Hero Copy (7 cols) */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[var(--c-alt2)] border border-[var(--c-acc)]/40 text-[var(--c-acc3)] text-xs sm:text-sm font-medium">
-                <Award className="w-4 h-4 text-[var(--c-acc2)]" />
-                <span>Téměř 30 let zkušeností • Tradice 3. generace čalouníků</span>
-              </div>
-
-              <h1 className="font-serif text-4xl sm:text-6xl lg:text-[4.15rem] font-semibold text-[var(--c-ink)] leading-[1.08] tracking-tight">
-                Dáváme věcem{' '}
-                <span className="italic font-normal text-[var(--c-acc2)]">nový život</span> a vašemu
-                interiéru duši.
-              </h1>
-
-              <p className="text-base sm:text-lg text-[var(--c-g44)] leading-relaxed max-w-2xl">
-                Jmenuji se <strong className="font-semibold text-[var(--c-ink)]">Ladislav Tobiášek</strong>.
-                V čalounické a restaurátorské dílně <strong>Charivari Home</strong> v Nové Vsi u
-                Mělníka propojujeme tradiční rukodělné postupy mého pradědy Františka s moderními
-                požadavky na funkčnost a estetiku. Přijďte si k nám vlastnoručně zrenovovat kus
-                nábytku na kurzu, nebo nám svěřte svůj rodinný poklad či autoveterána.
-              </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
-                <a
-                  href={CONTACT_INFO.reservantoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-base shadow-lg shadow-[var(--c-ink)]/15 border border-[var(--c-acc)]/60 transition-all group"
-                >
-                  <Calendar className="w-5 h-5 text-[var(--c-icon)]" />
-                  <span>Rezervace termínů kurzů</span>
-                  <ExternalLink className="w-4 h-4 text-[var(--c-icon)] group-hover:translate-x-0.5 transition-transform" />
-                </a>
-
-                <a
-                  href="#restaurovani"
-                  className="inline-flex items-center gap-2.5 px-6 py-4 rounded-full bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-base border border-[var(--c-acc)]/50 transition-all"
-                >
-                  <Hammer className="w-4 h-4 text-[var(--c-acc2)]" />
-                  <span>Zakázkové restaurování</span>
-                </a>
-              </div>
-
-              {/* Key Trust Metrics */}
-              <div className="pt-6 grid grid-cols-3 gap-4 sm:gap-8 border-t border-[var(--c-line)] max-w-xl">
-                <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
-                    ~90 let
-                  </div>
-                  <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
-                    rodinných kořenů v čalounění
-                  </div>
-                </div>
-                <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
-                    1 den
-                  </div>
-                  <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
-                    stačí k výrobě vlastního taburetu
-                  </div>
-                </div>
-                <div>
-                  <div className="font-serif text-2xl sm:text-3xl font-bold text-[var(--c-ink)]">
-                    100%
-                  </div>
-                  <div className="text-xs sm:text-sm text-[var(--c-g5e)]">
-                    poctivá ruční práce a materiály
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Hero Visual Collage (5 cols) */}
-            <div className="lg:col-span-5 relative">
-              <div className="grid grid-cols-12 gap-4 items-center">
-                {/* Main Workshop / Course Image */}
-                <div className="col-span-7 relative rounded-2xl overflow-hidden shadow-xl border-4 border-[var(--c-paper)] bg-[#1C1C1C] aspect-[4/5]">
-                  <img
-                    src="/images/service-kurzy.jpg"
-                    alt="Kurzy čalounění Charivari Home"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-3 left-3 right-3 text-[#FAFAF7]">
-                    <span className="text-[11px] uppercase tracking-wider text-[#E3A59B] font-semibold">
-                      Zážitkové kurzy
-                    </span>
-                    <p className="font-serif text-lg leading-snug">
-                      Vlastnoruční renovace a čalounění v naší dílně
-                    </p>
-                  </div>
-                </div>
-
-                {/* Stacked Secondary Images */}
-                <div className="col-span-5 space-y-4">
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[var(--c-paper)] aspect-square">
-                    <img
-                      src="/images/rest-kreslo.jpg"
-                      alt="Restaurované křeslo"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="relative rounded-2xl overflow-hidden shadow-lg border-4 border-[var(--c-paper)] aspect-[4/5]">
-                    <img
-                      src="/images/hist-1-frantisek.jpg"
-                      alt="Praděda František a děda Ladislav"
-                      className="w-full h-full object-cover archival-photo"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/85 via-transparent to-transparent" />
-                    <div className="absolute bottom-2.5 left-2.5 right-2.5 text-[#FAFAF7]">
-                      <span className="text-[10px] uppercase tracking-wider text-[#E3A59B]">
-                        Holešovice • 30. léta
-                      </span>
-                      <p className="font-serif text-xs leading-tight">
-                        Praděda František a děda Ladislav
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4 PILLARS OVERVIEW (Co v dílně nabízíme) */}
-      <section id="sluzby" className="py-20 bg-[var(--c-paper)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-14">
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
-              Řemeslo pod jednou střechou
-            </span>
-            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
-              Čtyři pilíře dílny Charivari Home
-            </h2>
-            <p className="text-[var(--c-g55)] mt-3 text-base sm:text-lg">
-               *Charivari* je slovo, které v sobě nese pestrost, rozmanitost a radost. Máme úctu k
-              barokním křeslům, ikonickému designu 20. století i historickým vozům.
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: 'Kurzy renovace a čalounění',
-                subtitle: 'Od 3 300 Kč • Celodenní zážitek',
-                desc: 'Přineste si vlastní židli či křesílko nebo si za 8 hodin vyrobte zbrusu nový čalouněný taburet.',
-                img: '/images/service-kurzy.jpg',
-                href: '#kurzy',
-                icon: Scissors,
-                cta: 'Vybrat kurz',
-              },
-              {
-                title: 'Zakázkové restaurování',
-                subtitle: 'Tradiční postupy & materiály',
-                desc: 'Kompletní čalounické práce, vyvazování pružin, africká tráva, koňské žíně a šelaková politura dřeva.',
-                img: '/images/service-restaurovani.jpg',
-                href: '#restaurovani',
-                icon: Hammer,
-                cta: 'Více o restaurování',
-              },
-              {
-                title: 'Autoveteráni a motocykly',
-                subtitle: 'Sedla & interiéry s úctou k historii',
-                desc: 'Renovace sedel motocyklů, čalounění sedadel, dveří a stropnic historických vozů s dobovou věrností.',
-                img: '/images/service-veterani.jpg',
-                href: '#veterani',
-                icon: Car,
-                cta: 'Prohlédnout veterány',
-              },
-              {
-                title: 'Dárkové poukazy',
-                subtitle: 'Originální dárek s věnováním',
-                desc: 'Darujte zážitek a vlastnoručně vyrobený kus nábytku. Na voucher napíšeme osobní věnování i fotografii.',
-                img: '/images/service-poukazy.jpg',
-                href: '#poukazy',
-                icon: Gift,
-                cta: 'Objednat poukaz',
-              },
-            ].map((card) => {
-              const IconComponent = card.icon;
-              return (
-                <a
-                  key={card.title}
-                  href={card.href}
-                  className="group bg-[var(--c-alt)] rounded-2xl overflow-hidden border border-[var(--c-line)] hover:border-[var(--c-acc)] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col"
-                >
-                  <div className="relative h-56 overflow-hidden bg-[#1C1C1C]">
-                    <img
-                      src={card.img}
-                      alt={card.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 left-3 w-10 h-10 rounded-xl bg-[#121212]/85 backdrop-blur-sm border border-[var(--c-acc)]/50 flex items-center justify-center text-[#E3A59B]">
-                      <IconComponent className="w-5 h-5" />
-                    </div>
-                  </div>
-                  <div className="p-6 flex-1 flex flex-col justify-between">
-                    <div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-[var(--c-acc2)]">
-                        {card.subtitle}
-                      </span>
-                      <h3 className="font-serif text-2xl font-semibold text-[var(--c-ink)] mt-1 group-hover:text-[var(--c-acc2)] transition-colors">
-                        {card.title}
-                      </h3>
-                      <p className="text-sm text-[var(--c-g55)] mt-2.5 leading-relaxed">{card.desc}</p>
-                    </div>
-                    <div className="mt-5 pt-4 border-t border-[var(--c-line)] flex items-center justify-between text-sm font-semibold text-[var(--c-ink)]">
-                      <span>{card.cta}</span>
-                      <ArrowRight className="w-4 h-4 text-[var(--c-acc2)] group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* COURSES SECTION (Kurzy čalounění a výroba taburetu) */}
-      <section id="kurzy" className="py-24 bg-[var(--c-alt)] border-y border-[var(--c-line)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-14 gap-6">
-            <div className="max-w-2xl">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
-                Zážitkové řemeslné kurzy v Nové Vsi u Mělníka
-              </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
-                Naučte se řemeslo, které dává smysl
-              </h2>
-              <p className="text-[var(--c-g44)] mt-3 text-base sm:text-lg">
-                „V Charivari nevyrábíme jen věci. Měníme způsob, jakým se díváte na svůj interiér. Z
-                věcí, které ostatní vyhazují, u nás společně tvoříme poklady.“
-              </p>
-            </div>
-            <div className="shrink-0">
-              <a
-                href={CONTACT_INFO.reservantoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm shadow-md border border-[var(--c-acc)]/50"
-              >
-                <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
-                <span>Zobrazit volné termíny v kalendáři</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
-              </a>
-            </div>
-          </div>
-
-          {/* 2 Detailed Course Cards */}
-          <div className="grid lg:grid-cols-2 gap-8">
-            {COURSES.map((course) => (
+        {/* 2 Detailed Course Cards */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {COURSES.map((course) => {
+            const detailPath: SeoRoute['path'] = course.id === 'taburet' ? '/t/' : '/kurzy/';
+            return (
               <div
                 key={course.id}
                 className="bg-[var(--c-paper)] rounded-3xl overflow-hidden border border-[var(--c-line2)] shadow-md flex flex-col justify-between"
@@ -556,7 +504,13 @@ export function App() {
                           <span>{course.duration}</span>
                         </div>
                         <h3 className="font-serif text-2xl sm:text-3xl font-semibold leading-tight">
-                          {course.title}
+                          <a
+                            href={detailPath}
+                            onClick={(e) => handleRouteClick(e, detailPath)}
+                            className="hover:underline"
+                          >
+                            {course.title}
+                          </a>
                         </h3>
                       </div>
                       <div className="text-right shrink-0 bg-[#121212]/90 px-4 py-2 rounded-2xl border border-[var(--c-acc)]/40">
@@ -615,7 +569,11 @@ export function App() {
                     <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
                   </a>
                   <a
-                    href="#poukazy"
+                    href="/darkove-poukazy/"
+                    onClick={(e) => {
+                      setSelectedVoucherCourse(course.id === 'taburet' ? '3900' : '3300');
+                      handleRouteClick(e, '/darkove-poukazy/');
+                    }}
                     className="inline-flex items-center justify-center gap-1.5 py-3.5 px-4 rounded-xl border border-[var(--c-acc)]/60 text-[var(--c-ink)] hover:bg-[var(--c-alt2)] text-sm font-medium transition-all"
                   >
                     <Gift className="w-4 h-4 text-[var(--c-acc2)]" />
@@ -623,600 +581,998 @@ export function App() {
                   </a>
                 </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
-          {/* Workshop Comfort Banner */}
-          <div className="mt-10 bg-[var(--c-paper)] rounded-2xl p-6 sm:p-8 border border-[var(--c-line2)] grid sm:grid-cols-3 gap-6">
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
-                <Scissors className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
-                  Ochranné pomůcky a nářadí k zapůjčení
-                </h4>
-                <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
-                  U nás se práší a občas i barví – v dílně jsou pro vás k zapůjčení zástěry,
-                  pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka i veškeré
-                  profesionální nářadí.
-                </p>
-              </div>
+        {/* Workshop Comfort Banner */}
+        <div className="mt-10 bg-[var(--c-paper)] rounded-2xl p-6 sm:p-8 border border-[var(--c-line2)] grid sm:grid-cols-3 gap-6">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
+              <Scissors className="w-5 h-5" />
             </div>
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
-                <Coffee className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
-                  Káva, čaj a občerstvení zdarma
-                </h4>
-                <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
-                  Po celý den je pro vás v dílně zdarma k dispozici káva, čaj, drobné občerstvení,
-                  dobrá nálada a špetka trpělivosti.
-                </p>
-              </div>
+            <div>
+              <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
+                Ochranné pomůcky a nářadí k zapůjčení
+              </h4>
+              <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
+                U nás se práší a občas i barví – v dílně jsou pro vás k zapůjčení zástěry,
+                pracovní a ochranné rukavice, respirátor nebo ochranné brýle a sluchátka i veškeré
+                profesionální nářadí.
+              </p>
             </div>
-            <div className="flex items-start gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
-                  Vzorníky látek přímo na místě
-                </h4>
-                <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
-                  Nechce se vám nic shánět? V dílně máme mnoho vzorníků kvalitních potahových látek,
-                  které si můžete osahat a přiložit k nábytku.
-                </p>
-              </div>
+          </div>
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
+              <Coffee className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
+                Káva, čaj a občerstvení zdarma
+              </h4>
+              <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
+                Po celý den je pro vás v dílně zdarma k dispozici káva, čaj, drobné občerstvení,
+                dobrá nálada a špetka trpělivosti.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[var(--c-alt2)] flex items-center justify-center text-[var(--c-acc2)] shrink-0">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-serif text-lg font-semibold text-[var(--c-ink)]">
+                Vzorníky látek přímo na místě
+              </h4>
+              <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-0.5">
+                Nechce se vám nic shánět? V dílně máme mnoho vzorníků kvalitních potahových látek,
+                které si můžete osahat a přiložit k nábytku.
+              </p>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
 
-      {/* ZAKÁZKOVÉ RESTAUROVÁNÍ SECTION */}
-      <section id="restaurovani" className="py-24 bg-[var(--c-paper)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
-            {/* Left Content (6 cols) */}
-            <div className="lg:col-span-6 space-y-6">
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
-                Zakázkové restaurování a čalounění
-              </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
-                Zachováváme historickou patinu a duši nábytku
-              </h2>
-              <p className="text-[var(--c-g44)] text-base sm:text-lg leading-relaxed">
-                Mým cílem není vytvořit nový kus nábytku, ale restaurovat ho tak, aby byla zachována
-                jeho historická patina a duše, a přitom byl plně využitelný pro moderní interiér.
-                Používám tradiční materiály jako jsou <strong>africká tráva</strong>,{' '}
-                <strong>koňské žíně</strong>, <strong>lněné popruhy</strong> a{' '}
-                <strong>klasické pružiny</strong>.
-              </p>
+  const restaurovaniSection = (
+    <section id="restaurovani" className="py-24 bg-[var(--c-paper)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          {/* Left Content (6 cols) */}
+          <div className="lg:col-span-6 space-y-6">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
+              Zakázkové restaurování a čalounění
+            </span>
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
+              Zachováváme historickou patinu a duši nábytku
+            </h2>
+            <p className="text-[var(--c-g44)] text-base sm:text-lg leading-relaxed">
+              Mým cílem není vytvořit nový kus nábytku, ale restaurovat ho tak, aby byla zachována
+              jeho historická patina a duše, a přitom byl plně využitelný pro moderní interiér.
+              Používám tradiční materiály jako jsou <strong>africká tráva</strong>,{' '}
+              <strong>koňské žíně</strong>, <strong>lněné popruhy</strong> a{' '}
+              <strong>klasické pružiny</strong>.
+            </p>
 
-              <div className="grid sm:grid-cols-2 gap-4 pt-2">
-                {[
-                  {
-                    title: 'Kompletní čalounické práce',
-                    desc: 'Od drobných oprav potahů až po celkovou rekonstrukci vnitřních výplní včetně ručního vyvazování pružin.',
-                  },
-                  {
-                    title: 'Restaurování dřevěných částí',
-                    desc: 'Čištění, doplňování chybějících řezeb, ruční leštění šelakovou politurou a tradiční voskování.',
-                  },
-                  {
-                    title: 'Konzervace a čištění',
-                    desc: 'Odborné a citlivé ošetření historických textilií, kůží a cenných solitérů.',
-                  },
-                  {
-                    title: 'Poradenství při výběru látek',
-                    desc: 'Široká škála vzorníků od prověřených českých i zahraničních dodavatelů potahových látek.',
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="p-5 rounded-2xl bg-[var(--c-alt)] border border-[var(--c-line)]"
-                  >
-                    <h3 className="font-serif text-xl font-semibold text-[var(--c-ink)]">
-                      {item.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-1.5 leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Photo Estimate Callout */}
-              <div className="p-6 rounded-2xl bg-[#151515] text-[#FAFAF7] border border-[#8B2E2E]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-[#E3A59B] text-xs font-semibold uppercase tracking-wider">
-                    <Camera className="w-4 h-4" />
-                    <span>Konzultace a nacenění podle fotek</span>
-                  </div>
-                  <p className="text-sm text-[#D6D2C8]">
-                    Pošlete nám fotografie vašeho nábytku a společně si řekneme, jaký by byl postup,
-                    termín i cena.
-                  </p>
-                </div>
-                <a
-                  href={`mailto:${CONTACT_INFO.emailMain}?subject=${encodeURIComponent(
-                    'Poptávka zakázkového restaurování / čalounění'
-                  )}`}
-                  className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#8B2E2E] hover:bg-[#E3A59B] text-[#121212] font-semibold text-sm transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>Poslat fotku e-mailem</span>
-                </a>
-              </div>
-            </div>
-
-            {/* Right Image Mosaic (6 cols) */}
-            <div className="lg:col-span-6 grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/5]">
-                  <img
-                    src="/images/rest-1.jpg"
-                    alt="Tradiční vyvazování pružin"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/3]">
-                  <img
-                    src="/images/rest-modre-zidle.jpg"
-                    alt="Zrestaurované modré židle"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              </div>
-              <div className="space-y-4 pt-6">
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/3]">
-                  <img
-                    src="/images/rest-2.jpg"
-                    alt="Zakázkové čalounění křesla"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/5]">
-                  <img
-                    src="/images/rest-lavice.jpg"
-                    alt="Čalouněná lavice na míru"
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* AUTOVETERÁNI A MOTOCYKLY SECTION (Dark Heritage Contrast) */}
-      <section id="veterani" className="py-24 bg-[#121212] text-[#F5F3EE] relative overflow-hidden">
-        <div className="pointer-events-none absolute top-0 left-1/3 w-96 h-96 rounded-full bg-[#8B2E2E]/10 blur-3xl" />
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
-            {/* Left Copy (5 cols) */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C1C1C] border border-[#8B2E2E]/40 text-[#E3A59B] text-xs font-medium">
-                <Car className="w-3.5 h-3.5" />
-                <span>Veteráni a motocykly</span>
-              </div>
-
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#FAFAF7] leading-tight">
-                Sedla a interiéry s úctou k historii
-              </h2>
-
-              <blockquote className="font-serif italic text-xl sm:text-2xl text-[#E3A59B] border-l-2 border-[#8B2E2E] pl-4">
-                „Vracíme komfort tam, kde se píše historie.“
-              </blockquote>
-
-              <p className="text-[#CFCCC4] text-sm sm:text-base leading-relaxed">
-                Váš stroj si zaslouží víc než jen nový potah. V <strong>Charivari</strong> rozumíme
-                tomu, že sedlo motorky nebo interiér autoveterána jsou klíčovými prvky, které
-                definují charakter celého stroje. Kombinujeme tradiční čalounické postupy s citem
-                pro dobovou věrnost i moderní nároky na komfort.
-              </p>
-
-              <div className="space-y-4 pt-2">
-                <div className="p-4 rounded-2xl bg-[#1C1C1C] border border-[#8B2E2E]/25">
-                  <h3 className="font-serif text-xl font-semibold text-[#E3A59B]">
-                    Interiéry autoveteránů
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#CFCCC4] mt-1">
-                    Navracíme lesk kabinám historických vozů. Specializujeme se na opravy a výrobu
-                    čalounění dveří, stropnic a sedadel s důrazem na zachování původního vzhledu.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-[#1C1C1C] border border-[#8B2E2E]/25">
-                  <h3 className="font-serif text-xl font-semibold text-[#E3A59B]">
-                    Renovace sedel motocyklů
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#CFCCC4] mt-1">
-                    Od opravy prosezených pěn až po kompletní přečalounění. Pracujeme s pravou kůží
-                    i vysoce odolnými technickými materiály, které zvládnou slunce i déšť.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-2 flex flex-wrap gap-3">
-                <a
-                  href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#8B2E2E] hover:bg-[#E3A59B] text-[#121212] font-semibold text-sm transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  <span>Konzultovat renovaci: {CONTACT_INFO.phoneMainDisplay}</span>
-                </a>
-                <button
-                  onClick={() => {
-                    setActiveGalleryCategory('veterani');
-                    document.getElementById('galerie')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full border border-[#8B2E2E]/50 text-[#FAFAF7] hover:bg-[#1C1C1C] text-sm font-medium transition-colors cursor-pointer"
-                >
-                  <span>Všechny fotky veteránů</span>
-                  <ArrowRight className="w-4 h-4 text-[#E3A59B]" />
-                </button>
-              </div>
-            </div>
-
-            {/* Right Photo Grid (7 cols) */}
-            <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4 pt-2">
               {[
-                '/images/service-veterani.jpg',
-                '/images/vet-1.jpg',
-                '/images/vet-2.jpg',
-                '/images/vet-5.jpg',
-                '/images/vet-6.jpg',
-                '/images/vet-8.jpg',
-              ].map((src, index) => (
+                {
+                  title: 'Kompletní čalounické práce',
+                  desc: 'Od drobných oprav potahů až po celkovou rekonstrukci vnitřních výplní včetně ručního vyvazování pružin.',
+                },
+                {
+                  title: 'Restaurování dřevěných částí',
+                  desc: 'Čištění, doplňování chybějících řezeb, ruční leštění šelakovou politurou a tradiční voskování.',
+                },
+                {
+                  title: 'Konzervace a čištění',
+                  desc: 'Odborné a citlivé ošetření historických textilií, kůží a cenných solitérů.',
+                },
+                {
+                  title: 'Poradenství při výběru látek',
+                  desc: 'Široká škála vzorníků od prověřených českých i zahraničních dodavatelů potahových látek.',
+                },
+              ].map((item) => (
                 <div
-                  key={src}
-                  onClick={() =>
-                    setLightboxItem({
-                      id: `vet-preview-${index}`,
-                      src,
-                      title: 'Renovace autoveteránů a motocyklů',
-                      category: 'veterani',
-                      description: 'Ukázka čalounické práce z dílny Charivari Home.',
-                    })
-                  }
-                  className={`group relative rounded-2xl overflow-hidden border border-[#8B2E2E]/30 cursor-pointer ${
-                    index === 0 ? 'col-span-2 sm:col-span-2 aspect-[16/10]' : 'aspect-square'
-                  }`}
+                  key={item.title}
+                  className="p-5 rounded-2xl bg-[var(--c-alt)] border border-[var(--c-line)]"
                 >
-                  <img
-                    src={src}
-                    alt="Čalounění autoveteránů"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-[#121212]/0 group-hover:bg-[#121212]/30 transition-colors flex items-center justify-center">
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-full bg-[#121212]/90 text-[#E3A59B] text-xs font-medium">
-                      Zvětšit fotografii
-                    </span>
-                  </div>
+                  <h3 className="font-serif text-xl font-semibold text-[var(--c-ink)]">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[var(--c-g55)] mt-1.5 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* GIFT VOUCHERS SECTION (Dárkové poukazy s konfigurátorem) */}
-      <section id="poukazy" className="py-24 bg-[var(--c-alt)] border-b border-[var(--c-line)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
-            {/* Voucher Visual Preview (6 cols) */}
-            <div className="lg:col-span-6 space-y-5">
-              <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-[var(--c-paper)] bg-[#121212]">
+            {/* Photo Estimate Callout */}
+            <div className="p-6 rounded-2xl bg-[#151515] text-[#FAFAF7] border border-[#8B2E2E]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-[#E3A59B] text-xs font-semibold uppercase tracking-wider">
+                  <Camera className="w-4 h-4" />
+                  <span>Konzultace a nacenění podle fotek</span>
+                </div>
+                <p className="text-sm text-[#D6D2C8]">
+                  Pošlete nám fotografie vašeho nábytku a společně si řekneme, jaký by byl postup,
+                  termín i cena.
+                </p>
+              </div>
+              <a
+                href={`mailto:${CONTACT_INFO.emailMain}?subject=${encodeURIComponent(
+                  'Poptávka zakázkového restaurování / čalounění'
+                )}`}
+                className="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#8B2E2E] hover:bg-[#E3A59B] text-[#121212] font-semibold text-sm transition-colors"
+              >
+                <Mail className="w-4 h-4" />
+                <span>Poslat fotku e-mailem</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Right Image Mosaic (6 cols) */}
+          <div className="lg:col-span-6 grid grid-cols-2 gap-4">
+            <div className="space-y-4">
+              <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/5]">
                 <img
-                  src="/images/voucher.jpg"
-                  alt="Dárkový voucher Charivari Home"
-                  className="w-full h-auto object-cover"
+                  src="/images/rest-1.jpg"
+                  alt="Tradiční vyvazování pružin"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
-
-              {/* Live Dedication Preview Card */}
-              <div className="p-6 rounded-2xl bg-[var(--c-paper)] border border-[var(--c-acc)]/50 shadow-sm">
-                <div className="flex items-center justify-between text-xs uppercase tracking-wider text-[var(--c-acc2)] font-semibold mb-2">
-                  <span>Náhled vašeho zadání na voucher</span>
-                  <span>Platnost: 1 rok</span>
-                </div>
-                <div className="font-serif text-xl font-semibold text-[var(--c-ink)]">
-                  {selectedVoucherCourse === '3300'
-                    ? 'Kurz Renovace a čalounění nábytku (3 300 Kč)'
-                    : 'Kurz Výroba čalouněného taburetu (3 900 Kč)'}
-                </div>
-                {voucherRecipient && (
-                  <p className="text-sm text-[var(--c-g2e)] mt-1">
-                    <strong>Pro koho:</strong> {voucherRecipient}
-                  </p>
-                )}
-                {voucherDedication ? (
-                  <p className="font-serif italic text-base text-[var(--c-g55)] mt-2 border-l-2 border-[var(--c-acc)] pl-3">
-                    „{voucherDedication}“
-                  </p>
-                ) : (
-                  <p className="text-xs text-[var(--c-g77)] mt-1.5">
-                    Na voucher vám rádi napíšeme osobní věnování a můžeme přidat i vámi zaslanou
-                    fotografii.
-                  </p>
-                )}
+              <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/3]">
+                <img
+                  src="/images/rest-modre-zidle.jpg"
+                  alt="Zrestaurované modré židle"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
               </div>
             </div>
-
-            {/* Voucher Interactive Order Box (6 cols) */}
-            <div className="lg:col-span-6 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--c-paper)] border border-[var(--c-acc)]/40 text-[var(--c-acc2)] text-xs font-semibold">
-                <Gift className="w-3.5 h-3.5" />
-                <span>Dárkové poukazy s platností 1 rok</span>
-              </div>
-
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
-                Darujte zážitek, který zůstane doma napořád
-              </h2>
-
-              <p className="text-[var(--c-g44)] text-base leading-relaxed">
-                Nabízíme nákup dárkového voucheru pro vás, vaše blízké či kolegy. Na vouchery píšeme
-                osobní věnování a můžeme na ně umístit například i zaslanou fotografii křesla či
-                obdarovaného.
-              </p>
-
-              {/* Step 1: Select Course */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--c-g55)]">
-                  1. Vyberte typ kurzu na poukaz:
-                </label>
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedVoucherCourse('3300')}
-                    className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
-                      selectedVoucherCourse === '3300'
-                        ? 'bg-[var(--c-ink)] text-[var(--c-paper)] border-[var(--c-acc)] shadow-md'
-                        : 'bg-[var(--c-paper)] text-[var(--c-ink)] border-[var(--c-line2)] hover:border-[var(--c-acc)]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wider text-[var(--c-acc)] font-semibold">
-                        Vlastní kus nábytku
-                      </span>
-                      <span className="font-serif text-xl font-bold">3 300 Kč</span>
-                    </div>
-                    <div className="font-serif text-lg font-semibold mt-1">
-                      Renovace a čalounění nábytku
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedVoucherCourse('3900')}
-                    className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
-                      selectedVoucherCourse === '3900'
-                        ? 'bg-[var(--c-ink)] text-[var(--c-paper)] border-[var(--c-acc)] shadow-md'
-                        : 'bg-[var(--c-paper)] text-[var(--c-ink)] border-[var(--c-line2)] hover:border-[var(--c-acc)]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs uppercase tracking-wider text-[var(--c-acc)] font-semibold">
-                        Materiál v ceně
-                      </span>
-                      <span className="font-serif text-xl font-bold">3 900 Kč</span>
-                    </div>
-                    <div className="font-serif text-lg font-semibold mt-1">
-                      Výroba čalouněného taburetu
-                    </div>
-                  </button>
-                </div>
-              </div>
-
-              {/* Step 2: Optional Personalization */}
-              <div className="space-y-3">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--c-g55)]">
-                  2. Osobní věnování (nepovinné – připraví text do objednávky):
-                </label>
-                <input
-                  type="text"
-                  maxLength={100}
-                  value={voucherRecipient}
-                  onChange={(e) => setVoucherRecipient(sanitizeInput(e.target.value, 100))}
-                  placeholder="Jméno obdarovaného (např. Pro maminku k narozeninám)"
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--c-paper)] border border-[var(--c-line2)] focus:outline-none focus:border-[var(--c-acc2)] text-sm"
-                />
-                <textarea
-                  rows={2}
-                  maxLength={300}
-                  value={voucherDedication}
-                  onChange={(e) => setVoucherDedication(sanitizeInput(e.target.value, 300))}
-                  placeholder="Váš text věnování na voucher..."
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--c-paper)] border border-[var(--c-line2)] focus:outline-none focus:border-[var(--c-acc2)] text-sm"
+            <div className="space-y-4 pt-6">
+              <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/3]">
+                <img
+                  src="/images/rest-2.jpg"
+                  alt="Zakázkové čalounění křesla"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
-
-              {/* Step 3: Order Buttons */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
-                <a
-                  href={CONTACT_INFO.reservantoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm border border-[var(--c-acc)]/50 shadow-md transition-all"
-                >
-                  <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
-                  <span>Přejít do rezervačního systému</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
-                </a>
-                <button
-                  type="button"
-                  onClick={handleVoucherMailto}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-sm border border-[var(--c-acc)]/60 transition-all cursor-pointer"
-                >
-                  <Mail className="w-4 h-4 text-[var(--c-acc2)]" />
-                  <span>Objednat e-mailem</span>
-                </button>
+              <div className="rounded-2xl overflow-hidden shadow-md border border-[var(--c-line)] aspect-[4/5]">
+                <img
+                  src="/images/rest-lavice.jpg"
+                  alt="Čalouněná lavice na míru"
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                />
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
 
-      {/* FAMILY HISTORY & ABOUT ME SECTION (Rodinná historie & O mně) */}
-      <section id="historie" className="py-24 bg-[var(--c-paper)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--c-alt2)] border border-[var(--c-acc)]/40 text-[var(--c-acc2)] text-xs font-semibold">
-              <History className="w-3.5 h-3.5" />
-              <span>Rodinná tradice • Praha 7 Holešovice &rarr; Nová Ves u Mělníka</span>
+  const veteraniSection = (
+    <section id="veterani" className="py-24 bg-[#121212] text-[#F5F3EE] relative overflow-hidden">
+      <div className="pointer-events-none absolute top-0 left-1/3 w-96 h-96 rounded-full bg-[#8B2E2E]/10 blur-3xl" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          {/* Left Copy (5 cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C1C1C] border border-[#8B2E2E]/40 text-[#E3A59B] text-xs font-medium">
+              <Car className="w-3.5 h-3.5" />
+              <span>Veteráni a motocykly</span>
             </div>
-            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-3">
-              Příběh psaný třemi generacemi
+
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[#FAFAF7] leading-tight">
+              Sedla a interiéry s úctou k historii
             </h2>
-            <p className="text-[var(--c-g44)] mt-4 text-base sm:text-lg leading-relaxed">
-              Jmenuji se <strong>Ladislav Tobiášek</strong> a restaurování a čalounění se věnuji
-              téměř 30 let. Tento obor vnímám nejen jako práci, ale především jako poslání uchovat
-              hodnoty vytvořené generacemi před námi. Moje cesta k řemeslu začala u mého pradědy{' '}
-              <strong>Františka</strong>, který byl vyhlášeným čalouníkem a dekoratérem. Každý kus
-              nábytku, který mi projde rukama, má svůj příběh, který se snažím citlivým zásahem
-              znovu oživit.
+
+            <blockquote className="font-serif italic text-xl sm:text-2xl text-[#E3A59B] border-l-2 border-[#8B2E2E] pl-4">
+              „Vracíme komfort tam, kde se píše historie.“
+            </blockquote>
+
+            <p className="text-[#CFCCC4] text-sm sm:text-base leading-relaxed">
+              Váš stroj si zaslouží víc než jen nový potah. V <strong>Charivari</strong> rozumíme
+              tomu, že sedlo motorky nebo interiér autoveterána jsou klíčovými prvky, které
+              definují charakter celého stroje. Kombinujeme tradiční čalounické postupy s citem
+              pro dobovou věrnost i moderní nároky na komfort.
             </p>
+
+            <div className="space-y-4 pt-2">
+              <div className="p-4 rounded-2xl bg-[#1C1C1C] border border-[#8B2E2E]/25">
+                <h3 className="font-serif text-xl font-semibold text-[#E3A59B]">
+                  Interiéry autoveteránů
+                </h3>
+                <p className="text-xs sm:text-sm text-[#CFCCC4] mt-1">
+                  Navracíme lesk kabinám historických vozů. Specializujeme se na opravy a výrobu
+                  čalounění dveří, stropnic a sedadel s důrazem na zachování původního vzhledu.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-[#1C1C1C] border border-[#8B2E2E]/25">
+                <h3 className="font-serif text-xl font-semibold text-[#E3A59B]">
+                  Renovace sedel motocyklů
+                </h3>
+                <p className="text-xs sm:text-sm text-[#CFCCC4] mt-1">
+                  Od opravy prosezených pěn až po kompletní přečalounění. Pracujeme s pravou kůží
+                  i vysoce odolnými technickými materiály, které zvládnou slunce i déšť.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-wrap gap-3">
+              <a
+                href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#8B2E2E] hover:bg-[#E3A59B] text-[#121212] font-semibold text-sm transition-colors"
+              >
+                <Phone className="w-4 h-4" />
+                <span>Konzultovat renovaci: {CONTACT_INFO.phoneMainDisplay}</span>
+              </a>
+              <a
+                href="/galerie/"
+                onClick={(e) => {
+                  setActiveGalleryCategory('veterani');
+                  setShowAllGallery(true);
+                  handleRouteClick(e, '/galerie/', 'galerie');
+                }}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full border border-[#8B2E2E]/50 text-[#FAFAF7] hover:bg-[#1C1C1C] text-sm font-medium transition-colors cursor-pointer"
+              >
+                <span>Všechny fotky veteránů</span>
+                <ArrowRight className="w-4 h-4 text-[#E3A59B]" />
+              </a>
+            </div>
           </div>
 
-          {/* 4 Archival Cards from Holešovice */}
-          <div className="grid md:grid-cols-2 gap-8">
-            {HISTORICAL_PHOTOS.map((photo, index) => (
+          {/* Right Photo Grid (7 cols) */}
+          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {[
+              '/images/service-veterani.jpg',
+              '/images/vet-1.jpg',
+              '/images/vet-2.jpg',
+              '/images/vet-5.jpg',
+              '/images/vet-6.jpg',
+              '/images/vet-8.jpg',
+            ].map((src, index) => (
               <div
-                key={photo.id}
+                key={src}
                 onClick={() =>
                   setLightboxItem({
-                    id: photo.id,
-                    src: photo.src,
-                    title: photo.title,
-                    category: 'historie',
-                    description: photo.caption,
+                    id: `vet-preview-${index}`,
+                    src,
+                    title: 'Renovace autoveteránů a motocyklů',
+                    category: 'veterani',
+                    description: 'Ukázka čalounické práce z dílny Charivari Home.',
                   })
                 }
-                className="group bg-[var(--c-alt)] rounded-3xl overflow-hidden border border-[var(--c-line2)] hover:border-[var(--c-acc)] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
-              >
-                <div className="relative h-80 overflow-hidden bg-[var(--c-ink)] p-3">
-                  <img
-                    src={photo.src}
-                    alt={photo.title}
-                    className="w-full h-full object-contain rounded-2xl archival-photo"
-                  />
-                  <div className="absolute top-6 left-6 px-3 py-1 rounded-full bg-[#121212]/85 text-[#E3A59B] text-xs font-medium border border-[var(--c-acc)]/40">
-                    {index + 1}. {photo.era}
-                  </div>
-                </div>
-                <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-serif text-2xl font-semibold text-[var(--c-ink)]">
-                      {photo.title}
-                    </h3>
-                    <p className="text-[var(--c-g44)] text-sm sm:text-base mt-2 leading-relaxed">
-                      {photo.caption}
-                    </p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-[var(--c-line)] text-xs font-semibold uppercase tracking-wider text-[var(--c-acc2)] flex items-center justify-between">
-                    <span>Rodinný archiv Tobiáškových</span>
-                    <span>Kliknutím zvětšíte &rarr;</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* INTERACTIVE GALLERY SECTION */}
-      <section id="galerie" className="py-24 bg-[var(--c-alt)] border-t border-[var(--c-line)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-            <div>
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
-                Portfolio &amp; Ukázky prací
-              </span>
-              <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
-                Galerie z naší dílny
-              </h2>
-            </div>
-
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap gap-2">
-              {[
-                { id: 'all', label: 'Všechny fotky' },
-                { id: 'kurzy', label: 'Kurzy v dílně' },
-                { id: 'restaurovani', label: 'Restaurování & Nábytek' },
-                { id: 'veterani', label: 'Autoveteráni & Motocykly' },
-                { id: 'historie', label: 'Historie' },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveGalleryCategory(tab.id as typeof activeGalleryCategory);
-                    setShowAllGallery(false);
-                  }}
-                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer ${
-                    activeGalleryCategory === tab.id
-                      ? 'bg-[var(--c-ink)] text-[var(--c-paper)] shadow-sm border border-[var(--c-acc)]'
-                      : 'bg-[var(--c-paper)] text-[var(--c-g44)] hover:bg-[var(--c-alt2)] border border-[var(--c-line2)]'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Photo Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
-            {displayedGallery.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => setLightboxItem(item)}
-                className="group relative rounded-2xl overflow-hidden bg-[var(--c-ink)] border border-[var(--c-line2)] aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all"
+                className={`group relative rounded-2xl overflow-hidden border border-[#8B2E2E]/30 cursor-pointer ${
+                  index === 0 ? 'col-span-2 sm:col-span-2 aspect-[16/10]' : 'aspect-square'
+                }`}
               >
                 <img
-                  src={item.src}
-                  alt={item.title}
-                  loading="lazy"
+                  src={src}
+                  alt="Čalounění autoveteránů"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                  <span className="text-[10px] uppercase tracking-wider text-[#E3A59B] font-semibold">
-                    {item.category === 'kurzy'
-                      ? 'Kurzy čalounění'
-                      : item.category === 'restaurovani'
-                      ? 'Restaurování'
-                      : item.category === 'veterani'
-                      ? 'Autoveteráni'
-                      : 'Rodinná historie'}
+                <div className="absolute inset-0 bg-[#121212]/0 group-hover:bg-[#121212]/30 transition-colors flex items-center justify-center">
+                  <span className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1.5 rounded-full bg-[#121212]/90 text-[#E3A59B] text-xs font-medium">
+                    Zvětšit fotografii
                   </span>
-                  <h4 className="font-serif text-base sm:text-lg text-[var(--c-paper)] leading-snug">
-                    {item.title}
-                  </h4>
                 </div>
               </div>
             ))}
           </div>
+        </div>
+      </div>
+    </section>
+  );
 
-          {/* Load More Toggle */}
-          {filteredGallery.length > 12 && (
-            <div className="mt-10 text-center">
-              <button
-                onClick={() => setShowAllGallery(!showAllGallery)}
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-sm border border-[var(--c-acc)]/60 shadow-sm transition-all cursor-pointer"
+  const poukazySection = (
+    <section id="poukazy" className="py-24 bg-[var(--c-alt)] border-b border-[var(--c-line)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          {/* Voucher Visual Preview (6 cols) */}
+          <div className="lg:col-span-6 space-y-5">
+            <div className="relative rounded-3xl overflow-hidden shadow-xl border-4 border-[var(--c-paper)] bg-[#121212]">
+              <img
+                src="/images/voucher.jpg"
+                alt="Dárkový voucher Charivari Home"
+                className="w-full h-auto object-cover"
+              />
+            </div>
+
+            {/* Live Dedication Preview Card */}
+            <div className="p-6 rounded-2xl bg-[var(--c-paper)] border border-[var(--c-acc)]/50 shadow-sm">
+              <div className="flex items-center justify-between text-xs uppercase tracking-wider text-[var(--c-acc2)] font-semibold mb-2">
+                <span>Náhled vašeho zadání na voucher</span>
+                <span>Platnost: 1 rok</span>
+              </div>
+              <div className="font-serif text-xl font-semibold text-[var(--c-ink)]">
+                {selectedVoucherCourse === '3300'
+                  ? 'Kurz Renovace a čalounění nábytku (3 300 Kč)'
+                  : 'Kurz Výroba čalouněného taburetu (3 900 Kč)'}
+              </div>
+              {voucherRecipient && (
+                <p className="text-sm text-[var(--c-g2e)] mt-1">
+                  <strong>Pro koho:</strong> {voucherRecipient}
+                </p>
+              )}
+              {voucherDedication ? (
+                <p className="font-serif italic text-base text-[var(--c-g55)] mt-2 border-l-2 border-[var(--c-acc)] pl-3">
+                  „{voucherDedication}“
+                </p>
+              ) : (
+                <p className="text-xs text-[var(--c-g77)] mt-1.5">
+                  Na voucher vám rádi napíšeme osobní věnování a můžeme přidat i vámi zaslanou
+                  fotografii.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Voucher Interactive Order Box (6 cols) */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--c-paper)] border border-[var(--c-acc)]/40 text-[var(--c-acc2)] text-xs font-semibold">
+              <Gift className="w-3.5 h-3.5" />
+              <span>Dárkové poukazy s platností 1 rok</span>
+            </div>
+
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
+              Darujte zážitek, který zůstane doma napořád
+            </h2>
+
+            <p className="text-[var(--c-g44)] text-base leading-relaxed">
+              Nabízíme nákup dárkového voucheru pro vás, vaše blízké či kolegy. Na vouchery píšeme
+              osobní věnování a můžeme na ně umístit například i zaslanou fotografii křesla či
+              obdarovaného.
+            </p>
+
+            {/* Step 1: Select Course */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--c-g55)]">
+                1. Vyberte typ kurzu na poukaz:
+              </label>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedVoucherCourse('3300')}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                    selectedVoucherCourse === '3300'
+                      ? 'bg-[var(--c-ink)] text-[var(--c-paper)] border-[var(--c-acc)] shadow-md'
+                      : 'bg-[var(--c-paper)] text-[var(--c-ink)] border-[var(--c-line2)] hover:border-[var(--c-acc)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase tracking-wider text-[var(--c-acc)] font-semibold">
+                      Vlastní kus nábytku
+                    </span>
+                    <span className="font-serif text-xl font-bold">3 300 Kč</span>
+                  </div>
+                  <div className="font-serif text-lg font-semibold mt-1">
+                    Renovace a čalounění nábytku
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedVoucherCourse('3900')}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                    selectedVoucherCourse === '3900'
+                      ? 'bg-[var(--c-ink)] text-[var(--c-paper)] border-[var(--c-acc)] shadow-md'
+                      : 'bg-[var(--c-paper)] text-[var(--c-ink)] border-[var(--c-line2)] hover:border-[var(--c-acc)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs uppercase tracking-wider text-[var(--c-acc)] font-semibold">
+                      Materiál v ceně
+                    </span>
+                    <span className="font-serif text-xl font-bold">3 900 Kč</span>
+                  </div>
+                  <div className="font-serif text-lg font-semibold mt-1">
+                    Výroba čalouněného taburetu
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Step 2: Optional Personalization */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--c-g55)]">
+                2. Osobní věnování (nepovinné – připraví text do objednávky):
+              </label>
+              <input
+                type="text"
+                maxLength={100}
+                value={voucherRecipient}
+                onChange={(e) => setVoucherRecipient(sanitizeInput(e.target.value, 100))}
+                placeholder="Jméno obdarovaného (např. Pro maminku k narozeninám)"
+                className="w-full px-4 py-3 rounded-xl bg-[var(--c-paper)] border border-[var(--c-line2)] focus:outline-none focus:border-[var(--c-acc2)] text-sm"
+              />
+              <textarea
+                rows={2}
+                maxLength={300}
+                value={voucherDedication}
+                onChange={(e) => setVoucherDedication(sanitizeInput(e.target.value, 300))}
+                placeholder="Váš text věnování na voucher..."
+                className="w-full px-4 py-3 rounded-xl bg-[var(--c-paper)] border border-[var(--c-line2)] focus:outline-none focus:border-[var(--c-acc2)] text-sm"
+              />
+            </div>
+
+            {/* Step 3: Order Buttons */}
+            <div className="pt-2 flex flex-wrap items-center gap-3">
+              <a
+                href={CONTACT_INFO.reservantoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-xl bg-[var(--c-ink)] hover:bg-[var(--c-g26)] text-[var(--c-paper)] font-medium text-sm border border-[var(--c-acc)]/50 shadow-md transition-all"
               >
-                <span>
-                  {showAllGallery
-                    ? 'Zobrazit méně fotografií'
-                    : `Zobrazit všech ${filteredGallery.length} fotografií v kategorii`}
-                </span>
+                <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
+                <span>Přejít do rezervačního systému</span>
+                <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
+              </a>
+              <button
+                type="button"
+                onClick={handleVoucherMailto}
+                className="inline-flex items-center justify-center gap-2 px-5 py-4 rounded-xl bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-sm border border-[var(--c-acc)]/60 transition-all cursor-pointer"
+              >
+                <Mail className="w-4 h-4 text-[var(--c-acc2)]" />
+                <span>Objednat e-mailem</span>
               </button>
             </div>
-          )}
+          </div>
         </div>
-      </section>
+      </div>
+    </section>
+  );
+
+  const historieSection = (
+    <section id="historie" className="py-24 bg-[var(--c-paper)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--c-alt2)] border border-[var(--c-acc)]/40 text-[var(--c-acc2)] text-xs font-semibold">
+            <History className="w-3.5 h-3.5" />
+            <span>Rodinná tradice • Praha 7 Holešovice &rarr; Nová Ves u Mělníka</span>
+          </div>
+          <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-3">
+            Příběh psaný třemi generacemi
+          </h2>
+          <p className="text-[var(--c-g44)] mt-4 text-base sm:text-lg leading-relaxed">
+            Jmenuji se <strong>Ladislav Tobiášek</strong> a restaurování a čalounění se věnuji
+            téměř 30 let. Tento obor vnímám nejen jako práci, ale především jako poslání uchovat
+            hodnoty vytvořené generacemi před námi. Moje cesta k řemeslu začala u mého pradědy{' '}
+            <strong>Františka</strong>, který byl vyhlášeným čalouníkem a dekoratérem. Každý kus
+            nábytku, který mi projde rukama, má svůj příběh, který se snažím citlivým zásahem
+            znovu oživit.
+          </p>
+        </div>
+
+        {/* 4 Archival Cards from Holešovice */}
+        <div className="grid md:grid-cols-2 gap-8">
+          {HISTORICAL_PHOTOS.map((photo, index) => (
+            <div
+              key={photo.id}
+              onClick={() =>
+                setLightboxItem({
+                  id: photo.id,
+                  src: photo.src,
+                  title: photo.title,
+                  category: 'historie',
+                  description: photo.caption,
+                })
+              }
+              className="group bg-[var(--c-alt)] rounded-3xl overflow-hidden border border-[var(--c-line2)] hover:border-[var(--c-acc)] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
+            >
+              <div className="relative h-80 overflow-hidden bg-[var(--c-ink)] p-3">
+                <img
+                  src={photo.src}
+                  alt={photo.title}
+                  className="w-full h-full object-contain rounded-2xl archival-photo"
+                />
+                <div className="absolute top-6 left-6 px-3 py-1 rounded-full bg-[#121212]/85 text-[#E3A59B] text-xs font-medium border border-[var(--c-acc)]/40">
+                  {index + 1}. {photo.era}
+                </div>
+              </div>
+              <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-serif text-2xl font-semibold text-[var(--c-ink)]">
+                    {photo.title}
+                  </h3>
+                  <p className="text-[var(--c-g44)] text-sm sm:text-base mt-2 leading-relaxed">
+                    {photo.caption}
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-[var(--c-line)] text-xs font-semibold uppercase tracking-wider text-[var(--c-acc2)] flex items-center justify-between">
+                  <span>Rodinný archiv Tobiáškových</span>
+                  <span>Kliknutím zvětšíte &rarr;</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+
+  const galerieSection = (
+    <section id="galerie" className="py-24 bg-[var(--c-alt)] border-t border-[var(--c-line)]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--c-acc2)]">
+              Portfolio &amp; Ukázky prací
+            </span>
+            <h2 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] mt-2">
+              Galerie z naší dílny
+            </h2>
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { id: 'all', label: 'Všechny fotky' },
+              { id: 'kurzy', label: 'Kurzy v dílně' },
+              { id: 'restaurovani', label: 'Restaurování & Nábytek' },
+              { id: 'veterani', label: 'Autoveteráni & Motocykly' },
+              { id: 'historie', label: 'Historie' },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveGalleryCategory(tab.id as typeof activeGalleryCategory);
+                  setShowAllGallery(false);
+                }}
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer ${
+                  activeGalleryCategory === tab.id
+                    ? 'bg-[var(--c-ink)] text-[var(--c-paper)] shadow-sm border border-[var(--c-acc)]'
+                    : 'bg-[var(--c-paper)] text-[var(--c-g44)] hover:bg-[var(--c-alt2)] border border-[var(--c-line2)]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Photo Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+          {displayedGallery.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => setLightboxItem(item)}
+              className="group relative rounded-2xl overflow-hidden bg-[var(--c-ink)] border border-[var(--c-line2)] aspect-square cursor-pointer shadow-sm hover:shadow-xl transition-all"
+            >
+              <img
+                src={item.src}
+                alt={item.title}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#121212]/85 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                <span className="text-[10px] uppercase tracking-wider text-[#E3A59B] font-semibold">
+                  {item.category === 'kurzy'
+                    ? 'Kurzy čalounění'
+                    : item.category === 'restaurovani'
+                    ? 'Restaurování'
+                    : item.category === 'veterani'
+                    ? 'Autoveteráni'
+                    : 'Rodinná historie'}
+                </span>
+                <h4 className="font-serif text-base sm:text-lg text-[var(--c-paper)] leading-snug">
+                  {item.title}
+                </h4>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Load More Toggle */}
+        {filteredGallery.length > 12 && (
+          <div className="mt-10 text-center">
+            <button
+              onClick={() => setShowAllGallery(!showAllGallery)}
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[var(--c-paper)] hover:bg-[var(--c-alt2)] text-[var(--c-ink)] font-medium text-sm border border-[var(--c-acc)]/60 shadow-sm transition-all cursor-pointer"
+            >
+              <span>
+                {showAllGallery
+                  ? 'Zobrazit méně fotografií'
+                  : `Zobrazit všech ${filteredGallery.length} fotografií v kategorii`}
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+
+  // Order sections dynamically so that each subpage puts its own main content FIRST right below its unique h1 header
+  const renderOrderedSections = () => {
+    switch (activeRoute.sectionId) {
+      case 'kurzy':
+        return (
+          <>
+            {coursesSection}
+            {poukazySection}
+            {pillarsSection}
+            {restaurovaniSection}
+            {veteraniSection}
+            {historieSection}
+            {galerieSection}
+            {heroSection}
+          </>
+        );
+      case 'restaurovani':
+        return (
+          <>
+            {restaurovaniSection}
+            {galerieSection}
+            {pillarsSection}
+            {coursesSection}
+            {veteraniSection}
+            {poukazySection}
+            {historieSection}
+            {heroSection}
+          </>
+        );
+      case 'veterani':
+        return (
+          <>
+            {veteraniSection}
+            {galerieSection}
+            {pillarsSection}
+            {restaurovaniSection}
+            {coursesSection}
+            {poukazySection}
+            {historieSection}
+            {heroSection}
+          </>
+        );
+      case 'poukazy':
+        return (
+          <>
+            {poukazySection}
+            {coursesSection}
+            {pillarsSection}
+            {restaurovaniSection}
+            {veteraniSection}
+            {historieSection}
+            {galerieSection}
+            {heroSection}
+          </>
+        );
+      case 'historie':
+        return (
+          <>
+            {historieSection}
+            {restaurovaniSection}
+            {pillarsSection}
+            {coursesSection}
+            {veteraniSection}
+            {poukazySection}
+            {galerieSection}
+            {heroSection}
+          </>
+        );
+      case 'galerie':
+        return (
+          <>
+            {galerieSection}
+            {pillarsSection}
+            {restaurovaniSection}
+            {veteraniSection}
+            {coursesSection}
+            {poukazySection}
+            {historieSection}
+            {heroSection}
+          </>
+        );
+      case 'kontakt':
+        return (
+          <>
+            {pillarsSection}
+            {coursesSection}
+            {restaurovaniSection}
+            {veteraniSection}
+            {poukazySection}
+            {historieSection}
+            {galerieSection}
+            {heroSection}
+          </>
+        );
+      default:
+        return (
+          <>
+            {heroSection}
+            {pillarsSection}
+            {coursesSection}
+            {restaurovaniSection}
+            {veteraniSection}
+            {poukazySection}
+            {historieSection}
+            {galerieSection}
+          </>
+        );
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[var(--c-paper)] text-[var(--c-ink)]">
+      {/* Top Heritage Bar */}
+      <div className="bg-[#121212] text-[#E4E1DA] text-xs sm:text-sm py-2.5 px-4 border-b border-[var(--c-acc)]/25">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-[#E3A59B]">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="font-medium tracking-wide">
+              Rodinná čalounická a restaurátorská dílna Ladislava Tobiáška
+            </span>
+          </div>
+          <div className="flex items-center gap-5 text-xs sm:text-sm">
+            <a
+              href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
+              className="flex items-center gap-1.5 hover:text-[#E3A59B] transition-colors"
+            >
+              <Phone className="w-3.5 h-3.5 text-[var(--c-acc)]" />
+              <span>{CONTACT_INFO.phoneMainDisplay}</span>
+            </a>
+            <span className="hidden md:inline text-[var(--c-acc)]/40">|</span>
+            <a
+              href="/kontakt/"
+              onClick={(e) => handleRouteClick(e, '/kontakt/', 'kontakt')}
+              className="hidden md:flex items-center gap-1.5 hover:text-[#E3A59B] transition-colors"
+            >
+              <MapPin className="w-3.5 h-3.5 text-[var(--c-acc)]" />
+              <span>{CONTACT_INFO.address}</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Sticky Header */}
+      <header className="sticky top-0 z-40 bg-[var(--c-paper)]/95 backdrop-blur-md border-b border-[var(--c-line)] transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+          {/* Brand Logo */}
+          <a
+            href="/"
+            onClick={(e) => handleRouteClick(e, '/')}
+            className="flex items-center gap-3.5 group"
+          >
+            <div className="w-14 h-12 rounded-lg overflow-hidden border border-[var(--c-acc)]/40 bg-[#121212] shadow-sm shrink-0">
+              <img
+                src="/images/logo-zlate.jpg"
+                alt="CHARIVARI HOME logo"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <div>
+              <span className="block font-serif text-xl sm:text-2xl font-bold tracking-wider text-[var(--c-ink)] leading-none">
+                CHARIVARI HOME
+              </span>
+              <span className="block text-[11px] uppercase tracking-[0.18em] text-[var(--c-g77)] mt-1">
+                Restaurování &amp; Kurzy čalounění
+              </span>
+            </div>
+          </a>
+
+          {/* Desktop Navigation */}
+          <nav
+            aria-label="Hlavní navigace"
+            className="hidden lg:flex items-center gap-6 text-sm font-medium text-[var(--c-g2e)]"
+          >
+            <a
+              href="/"
+              onClick={(e) => handleRouteClick(e, '/', 'sluzby')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/' ? 'text-[var(--c-acc2)] font-semibold' : ''
+              }`}
+            >
+              Co nabízíme
+            </a>
+            <a
+              href="/kurzy/"
+              onClick={(e) => handleRouteClick(e, '/kurzy/')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/kurzy/' || currentPath === '/t/'
+                  ? 'text-[var(--c-acc2)] font-semibold'
+                  : ''
+              }`}
+            >
+              Kurzy čalounění
+            </a>
+            <a
+              href="/zakazkove-restaurovani/"
+              onClick={(e) => handleRouteClick(e, '/zakazkove-restaurovani/')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/zakazkove-restaurovani/'
+                  ? 'text-[var(--c-acc2)] font-semibold'
+                  : ''
+              }`}
+            >
+              Zakázkové restaurování
+            </a>
+            <a
+              href="/autoveterani-renovace/"
+              onClick={(e) => handleRouteClick(e, '/autoveterani-renovace/')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/autoveterani-renovace/'
+                  ? 'text-[var(--c-acc2)] font-semibold'
+                  : ''
+              }`}
+            >
+              Autoveteráni
+            </a>
+            <a
+              href="/darkove-poukazy/"
+              onClick={(e) => handleRouteClick(e, '/darkove-poukazy/')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/darkove-poukazy/' ? 'text-[var(--c-acc2)] font-semibold' : ''
+              }`}
+            >
+              Dárkové poukazy
+            </a>
+            <a
+              href="/o-me/"
+              onClick={(e) => handleRouteClick(e, '/o-me/')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/o-me/' ? 'text-[var(--c-acc2)] font-semibold' : ''
+              }`}
+            >
+              Rodinná historie
+            </a>
+            <a
+              href="/galerie/"
+              onClick={(e) => handleRouteClick(e, '/galerie/')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/galerie/' ? 'text-[var(--c-acc2)] font-semibold' : ''
+              }`}
+            >
+              Galerie
+            </a>
+            <a
+              href="/kontakt/"
+              onClick={(e) => handleRouteClick(e, '/kontakt/', 'kontakt')}
+              className={`hover:text-[var(--c-acc2)] transition-colors ${
+                currentPath === '/kontakt/' ? 'text-[var(--c-acc2)] font-semibold' : ''
+              }`}
+            >
+              Kontakt
+            </a>
+          </nav>
+
+          {/* Header CTA */}
+          <div className="hidden sm:flex items-center gap-3">
+            <a
+              href={CONTACT_INFO.reservantoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--c-ink)] text-[var(--c-paper)] hover:bg-[var(--c-g26)] text-sm font-medium shadow-sm border border-[var(--c-acc)]/50 transition-all"
+            >
+              <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
+              <span>Rezervace kurzů</span>
+              <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
+            </a>
+          </div>
+
+          {/* Theme toggle */}
+          <button
+            type="button"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Přepnout na světlý režim' : 'Přepnout na tmavý režim'}
+            title={theme === 'dark' ? 'Světlý režim' : 'Tmavý režim'}
+            className="p-2.5 rounded-full border border-[var(--c-line)] text-[var(--c-ink)] hover:bg-[var(--c-alt2)] transition-colors cursor-pointer"
+          >
+            {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          </button>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Otevřít menu"
+            className="lg:hidden p-2.5 rounded-lg border border-[var(--c-line)] text-[var(--c-ink)] hover:bg-[var(--c-alt2)]"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Dropdown Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-[var(--c-paper)] border-b border-[var(--c-line)] px-4 pt-3 pb-6 space-y-2 shadow-xl">
+            {[
+              { href: '/' as SeoRoute['path'], label: 'Úvod & Co nabízíme' },
+              { href: '/kurzy/' as SeoRoute['path'], label: 'Kurzy čalounění (3 300 Kč)' },
+              { href: '/t/' as SeoRoute['path'], label: 'Kurz Výroba taburetu (3 900 Kč)' },
+              { href: '/zakazkove-restaurovani/' as SeoRoute['path'], label: 'Zakázkové restaurování' },
+              { href: '/autoveterani-renovace/' as SeoRoute['path'], label: 'Autoveteráni a motocykly' },
+              { href: '/darkove-poukazy/' as SeoRoute['path'], label: 'Dárkové poukazy' },
+              { href: '/o-me/' as SeoRoute['path'], label: 'O mně & Rodinná historie' },
+              { href: '/galerie/' as SeoRoute['path'], label: 'Galerie realizací' },
+              { href: '/kontakt/' as SeoRoute['path'], label: 'Kontakt' },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) =>
+                  handleRouteClick(e, link.href, link.href === '/kontakt/' ? 'kontakt' : undefined)
+                }
+                className="block py-2.5 px-3 rounded-lg text-base font-medium text-[var(--c-ink)] hover:bg-[var(--c-alt2)]"
+              >
+                {link.label}
+              </a>
+            ))}
+            <div className="pt-3 flex flex-col gap-2.5">
+              <a
+                href={CONTACT_INFO.reservantoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[var(--c-ink)] text-[var(--c-paper)] font-medium border border-[var(--c-acc)]/50"
+              >
+                <Calendar className="w-4 h-4 text-[var(--c-icon)]" />
+                <span>Rezervace termínů kurzů</span>
+                <ExternalLink className="w-3.5 h-3.5 text-[var(--c-icon)]" />
+              </a>
+              <a
+                href={`tel:${CONTACT_INFO.phoneMain.replace(/\s+/g, '')}`}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-[var(--c-acc)] text-[var(--c-ink)] font-medium"
+              >
+                <Phone className="w-4 h-4 text-[var(--c-acc2)]" />
+                <span>Zavolat: {CONTACT_INFO.phoneMainDisplay}</span>
+              </a>
+            </div>
+          </div>
+        )}
+      </header>
+
+      {/* Dedicated Subpage Editorial Banner & Breadcrumb (renders when visiting /kurzy/, /t/, /zakazkove-restaurovani/, etc.) */}
+      {isSubpage && (
+        <section className="bg-[var(--c-alt2)] border-b border-[var(--c-line)] py-10 sm:py-14">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav
+              aria-label="Drobečková navigace"
+              className="flex items-center gap-2 text-xs uppercase tracking-wider text-[var(--c-g55)] mb-4"
+            >
+              <a
+                href="/"
+                onClick={(e) => handleRouteClick(e, '/')}
+                className="hover:text-[var(--c-acc2)] font-semibold"
+              >
+                CHARIVARI HOME
+              </a>
+              <span>/</span>
+              <span className="text-[var(--c-acc2)] font-semibold">{activeRoute.breadcrumb}</span>
+            </nav>
+
+            <div className="max-w-4xl space-y-4">
+              <h1 className="font-serif text-3xl sm:text-5xl font-semibold text-[var(--c-ink)] leading-tight">
+                {activeRoute.h1}
+              </h1>
+              <p className="text-base sm:text-lg text-[var(--c-g44)] leading-relaxed">
+                {activeRoute.lead}
+              </p>
+              <div className="pt-2 flex flex-wrap gap-2">
+                {SEO_ROUTES.filter((r) => r.path !== activeRoute.path).map((route) => (
+                  <a
+                    key={route.path}
+                    href={route.path}
+                    onClick={(e) =>
+                      handleRouteClick(
+                        e,
+                        route.path,
+                        route.path === '/kontakt/' ? 'kontakt' : undefined
+                      )
+                    }
+                    className="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[var(--c-paper)] text-[var(--c-g2e)] hover:text-[var(--c-acc2)] border border-[var(--c-line2)] transition-colors"
+                  >
+                    {route.breadcrumb}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Main Content Sections */}
+      <main>{renderOrderedSections()}</main>
 
       {/* CONTACT & WORKSHOP FOOTER SECTION */}
       <footer id="kontakt" className="bg-[#121212] text-[#E8E6E0] pt-20 pb-12 border-t border-[#8B2E2E]/30">
@@ -1399,27 +1755,75 @@ export function App() {
             </div>
           </div>
 
-          {/* Bottom Copyright */}
+          {/* Bottom Copyright & Internal SEO Sitemap Links */}
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#888888]">
             <div>
               © {new Date().getFullYear()} CHARIVARI HOME – Ladislav Tobiášek. Všechna práva
               vyhrazena. Web vytvořil Oliver Tobiášek.
             </div>
-            <div className="flex flex-wrap gap-5">
-              <a href="#kurzy" className="hover:text-[#E3A59B]">
-                Kurzy
+            <div className="flex flex-wrap gap-4">
+              <a
+                href="/"
+                onClick={(e) => handleRouteClick(e, '/')}
+                className="hover:text-[#E3A59B]"
+              >
+                Domů
               </a>
-              <a href="#restaurovani" className="hover:text-[#E3A59B]">
+              <a
+                href="/kurzy/"
+                onClick={(e) => handleRouteClick(e, '/kurzy/')}
+                className="hover:text-[#E3A59B]"
+              >
+                Kurzy čalounění
+              </a>
+              <a
+                href="/t/"
+                onClick={(e) => handleRouteClick(e, '/t/')}
+                className="hover:text-[#E3A59B]"
+              >
+                Výroba taburetu
+              </a>
+              <a
+                href="/zakazkove-restaurovani/"
+                onClick={(e) => handleRouteClick(e, '/zakazkove-restaurovani/')}
+                className="hover:text-[#E3A59B]"
+              >
                 Restaurování
               </a>
-              <a href="#veterani" className="hover:text-[#E3A59B]">
+              <a
+                href="/autoveterani-renovace/"
+                onClick={(e) => handleRouteClick(e, '/autoveterani-renovace/')}
+                className="hover:text-[#E3A59B]"
+              >
                 Autoveteráni
               </a>
-              <a href="#poukazy" className="hover:text-[#E3A59B]">
+              <a
+                href="/darkove-poukazy/"
+                onClick={(e) => handleRouteClick(e, '/darkove-poukazy/')}
+                className="hover:text-[#E3A59B]"
+              >
                 Dárkové poukazy
               </a>
-              <a href="#historie" className="hover:text-[#E3A59B]">
+              <a
+                href="/o-me/"
+                onClick={(e) => handleRouteClick(e, '/o-me/')}
+                className="hover:text-[#E3A59B]"
+              >
                 O mně
+              </a>
+              <a
+                href="/galerie/"
+                onClick={(e) => handleRouteClick(e, '/galerie/')}
+                className="hover:text-[#E3A59B]"
+              >
+                Galerie
+              </a>
+              <a
+                href="/kontakt/"
+                onClick={(e) => handleRouteClick(e, '/kontakt/', 'kontakt')}
+                className="hover:text-[#E3A59B]"
+              >
+                Kontakt
               </a>
             </div>
           </div>

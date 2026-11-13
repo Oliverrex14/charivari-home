@@ -2,9 +2,25 @@
   RewriteEngine On
   RewriteBase /
 
-  # Force HTTPS
-  RewriteCond %{HTTPS} off
-  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+  # Force HTTPS and www
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} !^www\. [NC]
+  RewriteRule ^(.*)$ https://www.charivarihome.com/$1 [L,R=301]
+
+  # Legacy WordPress redirects
+  RewriteRule ^(home|doma|index\.php|feed|comments/feed)/?$ / [L,R=301]
+  RewriteRule ^(contact-us|kontakty)/?$ /kontakt/ [L,R=301]
+  RewriteRule ^restaurovani/?$ /zakazkove-restaurovani/ [L,R=301]
+  RewriteRule ^(veterani|autoveterani)/?$ /autoveterani-renovace/ [L,R=301]
+  RewriteRule ^(poukazy|voucher)/?$ /darkove-poukazy/ [L,R=301]
+  RewriteRule ^(historie|o-nas)/?$ /o-me/ [L,R=301]
+  RewriteRule ^(taburet|vyroba-taburetu)/?$ /t/ [L,R=301]
+  RewriteRule ^wp-content/uploads/.*$ /galerie/ [L,R=301]
+
+  # Serve pre-rendered directory index.html if it exists
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.+?)/?$ $1/index.html [L]
 
   # SPA fallback to index.html
   RewriteRule ^index\.html$ - [L]
