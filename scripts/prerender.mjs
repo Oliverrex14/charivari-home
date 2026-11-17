@@ -15,6 +15,58 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;');
 }
 
+function buildSubpageJsonLd(route) {
+  return JSON.stringify(
+    {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebPage',
+          '@id': `${route.canonical}#webpage`,
+          url: route.canonical,
+          name: route.title,
+          headline: route.h1,
+          description: route.description,
+          inLanguage: 'cs-CZ',
+          isPartOf: {
+            '@type': 'WebSite',
+            '@id': 'https://www.charivarihome.com/#website',
+            url: 'https://www.charivarihome.com/',
+            name: 'CHARIVARI HOME',
+          },
+          about: {
+            '@id': 'https://www.charivarihome.com/#business',
+          },
+          primaryImageOfPage: {
+            '@type': 'ImageObject',
+            url: route.ogImage,
+          },
+        },
+        {
+          '@type': 'BreadcrumbList',
+          '@id': `${route.canonical}#breadcrumb`,
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'CHARIVARI HOME',
+              item: 'https://www.charivarihome.com/',
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: route.breadcrumb,
+              item: route.canonical,
+            },
+          ],
+        },
+      ],
+    },
+    null,
+    2
+  );
+}
+
 async function runPrerender() {
   const templatePath = path.join(distDir, 'index.html');
   const templateHtml = fs.readFileSync(templatePath, 'utf-8');
@@ -70,27 +122,10 @@ async function runPrerender() {
       .replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
 
     if (route.path !== '/') {
-      const breadcrumbJsonLd = JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'CHARIVARI HOME',
-            item: 'https://www.charivarihome.com/',
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: route.breadcrumb,
-            item: route.canonical,
-          },
-        ],
-      });
+      const subpageJsonLd = buildSubpageJsonLd(route);
       pageHtml = pageHtml.replace(
-        '</head>',
-        `    <script type="application/ld+json">${breadcrumbJsonLd}</script>\n  </head>`
+        /<script type="application\/ld\+json">[\s\S]*?<\/script>/,
+        `<script type="application/ld+json">\n${subpageJsonLd}\n    </script>`
       );
     }
 
